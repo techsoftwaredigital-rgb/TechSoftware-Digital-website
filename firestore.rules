@@ -1,0 +1,55 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net: Default-deny all access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'techsoftware.digital@gmail.com'
+      );
+    }
+
+    function isValidEnquiry(data) {
+      return data.keys().hasAll(['name', 'phone', 'email', 'projectType', 'budgetRange', 'message', 'createdAt']) &&
+        data.keys().hasOnly(['name', 'companyName', 'phone', 'email', 'projectType', 'budgetRange', 'message', 'createdAt', 'status']) &&
+        data.name is string && data.name.size() >= 2 && data.name.size() <= 100 &&
+        (!('companyName' in data) || (data.companyName is string && data.companyName.size() <= 120)) &&
+        data.phone is string && data.phone.size() >= 8 && data.phone.size() <= 20 &&
+        data.email is string && data.email.size() <= 120 &&
+        data.projectType is string && data.projectType.size() <= 60 &&
+        data.budgetRange is string && data.budgetRange.size() <= 60 &&
+        data.message is string && data.message.size() >= 10 && data.message.size() <= 2000 &&
+        data.createdAt is string && data.createdAt.size() <= 40 &&
+        (!('status' in data) || (data.status is string && data.status in ['new', 'in_review', 'contacted', 'archived']));
+    }
+
+    // Enquiries Collection
+    match /enquiries/{enquiryId} {
+      // Allow creation of public enquiries from prospective clients with validated payload
+      allow create: if isValidId(enquiryId) && isValidEnquiry(incoming());
+
+      // Only administrators can read or update client enquiries
+      allow get: if isValidId(enquiryId) && isAdmin();
+      allow list: if isAdmin();
+      allow update: if isValidId(enquiryId) && isAdmin() && isValidEnquiry(incoming());
+      allow delete: if isValidId(enquiryId) && isAdmin();
+    }
+  }
+}

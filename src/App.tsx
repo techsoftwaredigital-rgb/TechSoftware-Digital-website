@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Navbar } from './components/Navbar';
 import { CyberMatrixCanvas } from './components/CyberMatrixCanvas';
+import { BackgroundOrb } from './components/BackgroundOrb';
 import { HeroSection } from './sections/HeroSection';
 import { ServicesSection } from './sections/ServicesSection';
 import { SolutionsSection } from './sections/SolutionsSection';
@@ -42,6 +43,9 @@ export default function App() {
     <div className="min-h-screen bg-[#030712] text-slate-100 relative selection:bg-cyan-500/20 selection:text-cyan-300">
       {/* Global Interactive Cyber Matrix Constellation Canvas */}
       <CyberMatrixCanvas />
+
+      {/* Subtle Slow-Moving Translucent 3D Orbs (React Three Fiber + Motion Scroll Reaction) */}
+      <BackgroundOrb />
 
       {/* Sticky Glassmorphic Navigation */}
       <Navbar onOpenContact={() => scrollToContact()} />

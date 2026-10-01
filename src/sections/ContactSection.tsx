@@ -9,8 +9,11 @@ import {
   Building,
   Sparkles,
   ArrowRight,
+  Database,
 } from 'lucide-react';
 import { CyberNebulaBackground } from '../components/CyberNebulaBackground';
+import { db, handleFirestoreError, OperationType } from '../firebase';
+import { doc, setDoc } from 'firebase/firestore';
 
 interface ContactSectionProps {
   prefilledProjectType?: string;
@@ -34,6 +37,8 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submittedEnquiryId, setSubmittedEnquiryId] = useState<string>('');
+  const [submissionError, setSubmissionError] = useState<string>('');
 
   useEffect(() => {
     if (prefilledProjectType) {
@@ -91,8 +96,9 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
     return errs;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmissionError('');
     const validationErrors = validate();
     setErrors(validationErrors);
 
@@ -102,11 +108,34 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
 
     setIsSubmitting(true);
 
-    // Simulate reliable client submission
-    setTimeout(() => {
-      setIsSubmitting(false);
+    const safeUniqueId = `enq_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+    const enquiryPayload = {
+      name: formData.name.trim(),
+      ...(formData.companyName.trim() ? { companyName: formData.companyName.trim() } : {}),
+      phone: formData.phone.trim(),
+      email: formData.email.trim(),
+      projectType: formData.projectType,
+      budgetRange: formData.budgetRange,
+      message: formData.message.trim(),
+      createdAt: new Date().toISOString(),
+      status: 'new',
+    };
+
+    try {
+      await setDoc(doc(db, 'enquiries', safeUniqueId), enquiryPayload);
+      setSubmittedEnquiryId(safeUniqueId);
       setIsSubmitted(true);
-    }, 700);
+    } catch (err) {
+      console.error('Failed to save to Firestore:', err);
+      try {
+        handleFirestoreError(err, OperationType.CREATE, `enquiries/${safeUniqueId}`);
+      } catch (e) {
+        // Fallback friendly message for user while error is logged per skill
+        setSubmissionError('Your enquiry could not be synced to cloud right now. Please reach out via WhatsApp or direct phone.');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleWhatsAppRedirect = () => {
@@ -228,8 +257,15 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                   </p>
                 </div>
 
-                <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 text-xs font-mono text-left max-w-md mx-auto space-y-1 text-slate-400">
-                  <div>Reference: <span className="text-cyan-400">TS-{Date.now().toString().slice(-6)}</span></div>
+                <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 text-xs font-mono text-left max-w-md mx-auto space-y-1.5 text-slate-400">
+                  <div className="flex items-center justify-between pb-1.5 border-b border-slate-800">
+                    <span className="flex items-center gap-1.5 text-cyan-400">
+                      <Database className="w-3.5 h-3.5 text-cyan-400" />
+                      <span>Firebase Firestore</span>
+                    </span>
+                    <span className="text-emerald-400 text-[11px]">Synced to Cloud</span>
+                  </div>
+                  <div>Reference: <span className="text-cyan-400 font-semibold">{submittedEnquiryId || `TS-${Date.now().toString().slice(-6)}`}</span></div>
                   <div>Direct Phone: <span className="text-white">{formData.phone}</span></div>
                   <div>Budget Range: <span className="text-white">{formData.budgetRange}</span></div>
                 </div>

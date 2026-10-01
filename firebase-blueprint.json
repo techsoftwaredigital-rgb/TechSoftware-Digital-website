@@ -1,0 +1,67 @@
+{
+  "entities": {
+    "Enquiry": {
+      "title": "Client Project Enquiry",
+      "description": "Project enquiries submitted by prospective business clients through the website contact and proposal forms.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 100,
+          "description": "Full name of the contact person."
+        },
+        "companyName": {
+          "type": "string",
+          "maxLength": 120,
+          "description": "Company or organization name."
+        },
+        "phone": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 20,
+          "description": "Contact phone number."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 120,
+          "description": "Contact email address."
+        },
+        "projectType": {
+          "type": "string",
+          "maxLength": 60,
+          "description": "Type of project requested (Website, Mobile App, Business Software, etc.)."
+        },
+        "budgetRange": {
+          "type": "string",
+          "maxLength": 60,
+          "description": "Selected preliminary budget tier."
+        },
+        "message": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 2000,
+          "description": "Detailed project brief or operational requirements."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the enquiry was received."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["new", "in_review", "contacted", "archived"],
+          "description": "Administrative lead status."
+        }
+      },
+      "required": ["name", "phone", "email", "projectType", "budgetRange", "message", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/enquiries/{enquiryId}": {
+      "schema": "Enquiry",
+      "description": "Client project enquiries and proposal requests submitted via the TechSoftware.digital portal."
+    }
+  }
+}
