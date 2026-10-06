@@ -1,7 +1,10 @@
 import React from 'react';
 import { Phone, Mail, Globe, ArrowUp, ArrowUpRight } from 'lucide-react';
+import { useMotionPreference } from '../context/MotionPreferenceContext';
 
 export const Footer: React.FC = () => {
+  const { prefersReducedMotion, motionMode, setMotionMode } = useMotionPreference();
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -132,13 +135,27 @@ export const Footer: React.FC = () => {
             © {new Date().getFullYear()} TechSoftware.digital. All rights reserved. Built for enterprise reliability.
           </p>
 
-          <div className="flex items-center gap-6">
-            <span className="text-[11px] font-mono text-slate-500">
-              Tagline: Websites, Apps & Business Software Solutions
-            </span>
+          <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+            <div className="flex items-center gap-2 text-xs font-mono text-slate-400 bg-slate-900/90 px-3 py-1.5 rounded-lg border border-slate-800">
+              <span className="text-[10px] uppercase text-slate-500">Motion:</span>
+              <button
+                onClick={() => setMotionMode(motionMode === 'reduced' ? 'full' : motionMode === 'full' ? 'system' : 'reduced')}
+                className="text-cyan-400 hover:text-cyan-300 transition-colors font-medium flex items-center gap-1.5 cursor-pointer"
+                title="Toggle Reduced Motion Accessibility Mode"
+              >
+                <span>
+                  {motionMode === 'reduced'
+                    ? 'Reduced (Active)'
+                    : motionMode === 'full'
+                    ? 'Full Animations'
+                    : `System (${prefersReducedMotion ? 'Reduced' : 'Standard'})`}
+                </span>
+              </button>
+            </div>
+
             <button
               onClick={scrollToTop}
-              className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white hover:border-cyan-500/40 transition-colors"
+              className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white hover:border-cyan-500/40 transition-colors cursor-pointer"
               aria-label="Back to top"
             >
               <ArrowUp className="w-4 h-4" />

@@ -11,10 +11,10 @@ export interface ServiceItem {
 
 export const servicesData: ServiceItem[] = [
   {
-    id: 'website-development',
-    title: 'Website Development',
-    shortDescription: 'Modern responsive websites designed for businesses, brands and professionals.',
-    fullDescription: 'We build fast, secure, and visually commanding websites engineered to convert visitors into loyal clients. Every website is custom-crafted with responsive layouts, modern design systems, and search engine optimization built-in from the ground up.',
+    id: 'websites',
+    title: 'WEBSITES',
+    shortDescription: 'Modern responsive websites designed for businesses, brands and global enterprises.',
+    fullDescription: 'We engineer ultra-fast, visually commanding websites built to convert visitors into loyal clients. Custom-crafted with responsive layouts, fluid typography, modern animation systems, and search engine optimization built-in from the ground up.',
     features: [
       'High-performance responsive design across mobile, tablet, and desktop',
       'SEO optimization with rich structured data and meta-tag architecture',
@@ -27,9 +27,9 @@ export const servicesData: ServiceItem[] = [
   },
   {
     id: 'web-applications',
-    title: 'Web Applications',
-    shortDescription: 'Custom business workflow applications and scalable web platforms.',
-    fullDescription: 'From client portals to data-intensive management platforms, we architect resilient web applications that streamline operations and support complex transactional workflows with enterprise-grade stability.',
+    title: 'WEB APPLICATIONS',
+    shortDescription: 'Custom business workflow platforms, client portals and scalable web applications.',
+    fullDescription: 'From client self-service portals to data-intensive operational management platforms, we architect resilient web applications that streamline operations and support complex transactional workflows with enterprise-grade stability.',
     features: [
       'Secure role-based authentication and granular permission management',
       'Real-time data synchronization and live event processing',
@@ -41,24 +41,9 @@ export const servicesData: ServiceItem[] = [
     iconName: 'LayoutGrid'
   },
   {
-    id: 'mobile-app-development',
-    title: 'Mobile App Development',
-    shortDescription: 'Android and iOS applications with modern user experiences.',
-    fullDescription: 'Native-feel mobile apps crafted to deliver fluid 60fps animations, intuitive gesture navigation, offline reliability, and seamless hardware sensor integration for both Android and iOS devices.',
-    features: [
-      'Cross-platform codebase delivering native speed on Android and iOS',
-      'Offline-first architecture with local cache synchronization',
-      'Push notification pipelines and background service workers',
-      'Secure biometric authentication and payment gateway integration'
-    ],
-    deliverables: ['Compiled App Bundles (APK / AAB / IPA)', 'Store Deployment Support', 'API Backend Support'],
-    technologies: ['React Native', 'Flutter', 'TypeScript', 'Firebase Cloud Messaging'],
-    iconName: 'Smartphone'
-  },
-  {
-    id: 'business-management-software',
-    title: 'Business Management Software',
-    shortDescription: 'Custom software for billing, CRM, inventory, accounting and business operations.',
+    id: 'business-software',
+    title: 'BUSINESS SOFTWARE',
+    shortDescription: 'Custom ERP, CRM, POS, inventory, billing and business management systems.',
     fullDescription: 'Replace chaotic spreadsheets and fragmented SaaS subscriptions with a single cohesive operational engine designed around your exact business logic, billing tiers, inventory lifecycles, and staff hierarchies.',
     features: [
       'Automated invoice generation, tax computation, and digital receipts',
@@ -71,25 +56,55 @@ export const servicesData: ServiceItem[] = [
     iconName: 'Building2'
   },
   {
-    id: 'ecommerce-solutions',
-    title: 'E-Commerce Solutions',
-    shortDescription: 'Modern online stores and custom e-commerce platforms.',
-    fullDescription: 'High-conversion digital storefronts built with frictionless checkout paths, instant search filters, inventory syncing, payment gateways, and automated order fulfillment pipelines.',
+    id: 'android-apps',
+    title: 'ANDROID APPS',
+    shortDescription: 'High-performance Android applications with modern material aesthetics and offline support.',
+    fullDescription: 'Native and cross-platform Android applications crafted to deliver fluid 60fps animations, intuitive gesture navigation, offline reliability, background workers, and seamless Google Play integration.',
     features: [
-      'Multi-currency and domestic/international payment gateways',
-      'Dynamic product variants, size guides, and faceted search',
-      'One-click checkout and abandoned cart recovery systems',
-      'Automated dispatch, courier tracking, and customer portal'
+      'Native runtime speed optimized for all screen densities and devices',
+      'Offline-first architecture with local cache synchronization',
+      'Firebase Cloud Messaging and push notification pipelines',
+      'Secure biometric authentication and Google Pay payment integration'
     ],
-    deliverables: ['Storefront App', 'Merchant Order Dashboard', 'Payment Gateway Integration', 'Inventory Matrix'],
-    technologies: ['Next.js', 'Node.js', 'Stripe / Razorpay', 'PostgreSQL'],
-    iconName: 'ShoppingBag'
+    deliverables: ['Compiled App Bundles (APK & AAB)', 'Play Store Deployment Support', 'API Backend Endpoints'],
+    technologies: ['Kotlin', 'React Native', 'TypeScript', 'Firebase'],
+    iconName: 'Smartphone'
+  },
+  {
+    id: 'ios-apps',
+    title: 'iOS APPS',
+    shortDescription: 'Premium iOS applications crafted to Apple Human Interface Guidelines standards.',
+    fullDescription: 'Elegant, ultra-fluid iOS applications engineered for iPhone and iPad. Leverages hardware capabilities, Apple Pay, FaceID biometric security, and fluid interactive gestures.',
+    features: [
+      'Apple Human Interface Guidelines compliance and luxury aesthetics',
+      'Haptic feedback and custom fluid interactive transitions',
+      'Biometric authentication (Face ID / Touch ID) and Apple Pay',
+      'Seamless App Store submission and TestFlight staging'
+    ],
+    deliverables: ['Xcode Project & IPA Builds', 'App Store Connect Setup', 'TestFlight Staging Access'],
+    technologies: ['Swift', 'React Native', 'TypeScript', 'Apple Pay'],
+    iconName: 'Smartphone'
+  },
+  {
+    id: 'saas-platforms',
+    title: 'SAAS PLATFORMS',
+    shortDescription: 'Scalable multi-tenant SaaS platforms with automated billing and team isolation.',
+    fullDescription: 'End-to-end multi-tenant SaaS architecture engineered for fast user onboarding, tiered subscription billing, usage metering, data isolation, and smooth horizontal scaling.',
+    features: [
+      'Multi-tenant data isolation and organization team switching',
+      'Subscription lifecycle handling with automated recurring billing',
+      'Granular audit trails and compliance-ready security logging',
+      'Developer API keys and webhook dispatch system'
+    ],
+    deliverables: ['Multi-tenant Web Application', 'Billing Portal', 'API Documentation', 'Monitoring Setup'],
+    technologies: ['Next.js', 'Node.js', 'Docker', 'PostgreSQL', 'Redis'],
+    iconName: 'Cloud'
   },
   {
     id: 'ai-solutions',
-    title: 'AI Solutions',
-    shortDescription: 'AI-powered assistants, automation and intelligent business tools.',
-    fullDescription: 'Harness practical, high-impact machine learning and LLM capabilities to automate customer inquiries, summarize documents, parse financial receipts, and provide predictive intelligence directly within your workflows.',
+    title: 'AI SOLUTIONS',
+    shortDescription: 'AI-powered assistants, automated neural workflows and intelligent business tools.',
+    fullDescription: 'Harness practical, high-impact machine learning and Gemini LLM capabilities to automate customer inquiries, summarize documents, parse financial receipts, and provide predictive intelligence directly within your workflows.',
     features: [
       'Domain-tuned conversational assistants for 24/7 customer support',
       'Automated document extraction (invoices, contracts, identification)',
@@ -101,24 +116,9 @@ export const servicesData: ServiceItem[] = [
     iconName: 'Cpu'
   },
   {
-    id: 'saas-development',
-    title: 'SaaS Development',
-    shortDescription: 'Scalable SaaS platforms and multi-user business applications.',
-    fullDescription: 'End-to-end multi-tenant SaaS architecture engineered for fast user onboarding, tiered subscription billing, usage metering, data isolation, and smooth horizontal scaling.',
-    features: [
-      'Multi-tenant data isolation and organization team switching',
-      'Subscription lifecycle handling with automated recurring billing',
-      'Granular audit trails and compliance-ready security logging',
-      'Developer API keys and webhook dispatch system'
-    ],
-    deliverables: ['Multi-tenant Web Application', 'Billing Billing Portal', 'API Documentation', 'Monitoring Setup'],
-    technologies: ['Next.js', 'Node.js', 'Docker', 'PostgreSQL', 'Redis'],
-    iconName: 'Cloud'
-  },
-  {
     id: 'custom-software',
-    title: 'Custom Software',
-    shortDescription: 'Software designed specifically around unique business requirements.',
+    title: 'CUSTOM SOFTWARE',
+    shortDescription: 'Software designed specifically around unique business rules and proprietary algorithms.',
     fullDescription: 'When off-the-shelf software falls short of your distinct business model, we build purpose-built software from the ground up to address proprietary calculations, legacy data bridges, and unique operational workflows.',
     features: [
       'Tailored business logic engineered without unnecessary bloated bloatware',

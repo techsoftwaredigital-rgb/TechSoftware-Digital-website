@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { useMotionPreference } from '../context/MotionPreferenceContext';
 
 export const Scene3D: React.FC = () => {
+  const { prefersReducedMotion } = useMotionPreference();
   const containerRef = useRef<HTMLDivElement>(null);
   const [webglSupported, setWebglSupported] = useState(true);
   const [isLowPerformance, setIsLowPerformance] = useState(false);
@@ -269,47 +271,57 @@ export const Scene3D: React.FC = () => {
       const delta = clock.getDelta();
       const elapsedTime = clock.getElapsedTime();
 
-      // Smooth camera / group rotation via mouse lerp
-      mouseX += (targetX - mouseX) * 0.05;
-      mouseY += (targetY - mouseY) * 0.05;
+      // Smooth camera / group rotation via mouse lerp (disabled or muted if user prefers reduced motion)
+      if (prefersReducedMotion) {
+        masterGroup.rotation.y += 0.0006;
+        masterGroup.rotation.x = 0;
+        masterGroup.rotation.z = 0;
+        camera.position.x = 0;
+        camera.position.y = 0.5;
+      } else {
+        mouseX += (targetX - mouseX) * 0.05;
+        mouseY += (targetY - mouseY) * 0.05;
 
-      masterGroup.rotation.y += 0.0035;
-      masterGroup.rotation.x = mouseY * 0.6;
-      masterGroup.rotation.z = mouseX * 0.3;
+        masterGroup.rotation.y += 0.0035;
+        masterGroup.rotation.x = mouseY * 0.6;
+        masterGroup.rotation.z = mouseX * 0.3;
 
-      digitalSphere.rotation.y = elapsedTime * 0.08;
-      digitalSphere.rotation.x = Math.sin(elapsedTime * 0.05) * 0.1;
+        camera.position.x = mouseX * 0.8;
+        camera.position.y = 0.5 + mouseY * 0.5;
+      }
 
-      orbitalRing.rotation.z = -elapsedTime * 0.04;
-      secondOrbitalRing.rotation.z = elapsedTime * 0.03;
+      digitalSphere.rotation.y = elapsedTime * (prefersReducedMotion ? 0.015 : 0.08);
+      digitalSphere.rotation.x = Math.sin(elapsedTime * 0.05) * (prefersReducedMotion ? 0.02 : 0.1);
+
+      orbitalRing.rotation.z = -elapsedTime * (prefersReducedMotion ? 0.01 : 0.04);
+      secondOrbitalRing.rotation.z = elapsedTime * (prefersReducedMotion ? 0.008 : 0.03);
 
       // Small floating tech element orbits
       techMeshes.forEach((mesh, index) => {
-        mesh.rotation.x += 0.015;
-        mesh.rotation.y += 0.02;
-        mesh.position.y += Math.sin(elapsedTime * 1.5 + index) * 0.003;
+        mesh.rotation.x += prefersReducedMotion ? 0.003 : 0.015;
+        mesh.rotation.y += prefersReducedMotion ? 0.004 : 0.02;
+        mesh.position.y += Math.sin(elapsedTime * 1.5 + index) * (prefersReducedMotion ? 0.0008 : 0.003);
       });
 
-      // Ambient particle drift
-      const positions = ambientGeom.attributes.position.array as Float32Array;
-      for (let i = 0; i < ambientCount; i++) {
-        const idx = i * 3;
-        positions[idx] += ambientSpeeds[i].vx;
-        positions[idx + 1] += ambientSpeeds[i].vy;
-        positions[idx + 2] += ambientSpeeds[i].vz;
+      // Ambient particle drift (skipped or muted on reduced motion)
+      if (!prefersReducedMotion) {
+        const positions = ambientGeom.attributes.position.array as Float32Array;
+        for (let i = 0; i < ambientCount; i++) {
+          const idx = i * 3;
+          positions[idx] += ambientSpeeds[i].vx;
+          positions[idx + 1] += ambientSpeeds[i].vy;
+          positions[idx + 2] += ambientSpeeds[i].vz;
 
-        // Wrap around boundaries
-        const limit = isMobile ? 8 : 10;
-        if (positions[idx] > limit) positions[idx] = -limit;
-        if (positions[idx] < -limit) positions[idx] = limit;
-        if (positions[idx + 1] > limit) positions[idx + 1] = -limit;
-        if (positions[idx + 1] < -limit) positions[idx + 1] = limit;
+          // Wrap around boundaries
+          const limit = isMobile ? 8 : 10;
+          if (positions[idx] > limit) positions[idx] = -limit;
+          if (positions[idx] < -limit) positions[idx] = limit;
+          if (positions[idx + 1] > limit) positions[idx + 1] = -limit;
+          if (positions[idx + 1] < -limit) positions[idx + 1] = limit;
+        }
+        ambientGeom.attributes.position.needsUpdate = true;
       }
-      ambientGeom.attributes.position.needsUpdate = true;
 
-      // Subtle parallax camera motion
-      camera.position.x = mouseX * 0.8;
-      camera.position.y = 0.5 + mouseY * 0.5;
       camera.lookAt(0, 0, 0);
 
       renderer.render(scene, camera);

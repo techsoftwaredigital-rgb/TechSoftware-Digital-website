@@ -4,7 +4,6 @@ import {
   LayoutGrid,
   Smartphone,
   Building2,
-  ShoppingBag,
   Cpu,
   Cloud,
   Code2,
@@ -23,13 +22,12 @@ const iconMap: Record<string, React.FC<{ className?: string }>> = {
   LayoutGrid,
   Smartphone,
   Building2,
-  ShoppingBag,
   Cpu,
   Cloud,
   Code2,
 };
 
-// Interactive 3D Tilt Card Component
+// Interactive 3D Perspective Tilt Card Component
 const TiltCard: React.FC<{
   service: ServiceItem;
   index: number;
@@ -47,15 +45,15 @@ const TiltCard: React.FC<{
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
 
-    const rX = ((y - centerY) / centerY) * -7;
-    const rY = ((x - centerX) / centerX) * 7;
+    const rX = ((y - centerY) / centerY) * -6.5;
+    const rY = ((x - centerX) / centerX) * 6.5;
 
     setRotateX(rX);
     setRotateY(rY);
     setGlarePos({
       x: (x / rect.width) * 100,
       y: (y / rect.height) * 100,
-      opacity: 0.18,
+      opacity: 0.22,
     });
   };
 
@@ -68,10 +66,7 @@ const TiltCard: React.FC<{
   const IconComponent = iconMap[service.iconName] || Code2;
 
   return (
-    <div
-      style={{ perspective: 1000 }}
-      className="h-full"
-    >
+    <div style={{ perspective: 1000 }} className="h-full">
       <div
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
@@ -79,32 +74,32 @@ const TiltCard: React.FC<{
           transform: `rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(0)`,
           transition: 'transform 0.15s ease-out, border-color 0.25s, box-shadow 0.25s',
         }}
-        className="group relative h-full flex flex-col justify-between p-6 sm:p-7 rounded-2xl glass-panel border border-slate-800/80 hover:border-cyan-500/40 hover:shadow-xl hover:shadow-cyan-950/30 transition-all duration-300"
+        className="group relative h-full flex flex-col justify-between p-6 sm:p-7 rounded-2xl glass-panel border border-slate-800/80 hover:border-cyan-500/50 hover:shadow-2xl hover:shadow-cyan-950/40 transition-all duration-300"
       >
-        {/* Dynamic glare highlight */}
+        {/* Dynamic internal luminous glare highlight */}
         <div
           className="absolute inset-0 rounded-2xl pointer-events-none transition-opacity duration-300"
           style={{
-            background: `radial-gradient(circle at ${glarePos.x}% ${glarePos.y}%, rgba(6, 182, 212, ${glarePos.opacity}), transparent 60%)`,
+            background: `radial-gradient(circle at ${glarePos.x}% ${glarePos.y}%, rgba(6, 182, 212, ${glarePos.opacity}), transparent 65%)`,
           }}
         />
 
         {/* Card Header & Icon */}
         <div>
           <div className="flex items-center justify-between mb-5">
-            <div className="w-12 h-12 rounded-xl bg-slate-800/80 border border-slate-700/60 flex items-center justify-center text-cyan-400 group-hover:scale-110 group-hover:bg-cyan-950/30 group-hover:border-cyan-500/40 group-hover:text-cyan-300 transition-all duration-300 shadow-md">
-              <IconComponent className="w-6 h-6" />
+            <div className="w-12 h-12 rounded-xl bg-slate-900 border border-slate-700/60 flex items-center justify-center text-cyan-400 group-hover:scale-110 group-hover:bg-cyan-950/40 group-hover:border-cyan-400/50 group-hover:text-cyan-300 group-hover:shadow-lg group-hover:shadow-cyan-500/20 transition-all duration-300 shadow-md">
+              <IconComponent className="w-6 h-6 transition-transform duration-300 group-hover:rotate-3" />
             </div>
-            <span className="text-xs font-mono text-slate-500 group-hover:text-slate-400">
-              0{index + 1}
+            <span className="text-xs font-mono text-slate-500 group-hover:text-cyan-400 transition-colors">
+              0{index + 1} // MODULE
             </span>
           </div>
 
-          <h3 className="text-xl font-bold font-display text-white group-hover:text-cyan-300 transition-colors">
+          <h3 className="text-lg sm:text-xl font-bold font-display text-white group-hover:text-cyan-300 transition-colors">
             {service.title}
           </h3>
 
-          <p className="mt-3 text-sm text-slate-400 leading-relaxed">
+          <p className="mt-3 text-xs sm:text-sm text-slate-400 leading-relaxed">
             {service.shortDescription}
           </p>
         </div>
@@ -117,7 +112,7 @@ const TiltCard: React.FC<{
 
           <button
             onClick={() => onLearnMore(service)}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-cyan-400 group-hover:text-cyan-300 group-hover:translate-x-1 transition-all"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-cyan-400 hover:text-cyan-300 group-hover:translate-x-1 transition-all cursor-pointer"
             aria-label={`Learn more about ${service.title}`}
           >
             <span>Learn More</span>
@@ -135,33 +130,26 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
   const [selectedService, setSelectedService] = useState<ServiceItem | null>(null);
 
   return (
-    <section id="services" className="relative py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden">
-      {/* Background Animated Cyber Mesh */}
-      <div className="absolute inset-0 tech-grid-cyan opacity-40 pointer-events-none" />
-
-      {/* Background animated glow nodes */}
-      <div className="absolute top-1/2 left-0 w-96 h-96 bg-cyan-600/15 rounded-full blur-[100px] pointer-events-none -translate-x-1/2 animate-pulse-glow" />
-      <div className="absolute top-1/3 right-0 w-80 h-80 bg-blue-600/15 rounded-full blur-[100px] pointer-events-none translate-x-1/2 animate-pulse-glow" style={{ animationDelay: '2s' }} />
-
-      {/* Floating Holographic Ring */}
-      <div className="absolute top-12 right-12 w-64 h-64 rounded-full border border-cyan-500/10 animate-radar pointer-events-none" />
-      <div className="absolute bottom-16 left-8 w-80 h-80 rounded-full border border-dashed border-indigo-500/10 animate-radar pointer-events-none" style={{ animationDuration: '20s', animationDirection: 'reverse' }} />
+    <section id="services" className="relative py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      {/* Background glow node */}
+      <div className="absolute top-1/2 left-0 w-96 h-96 bg-cyan-900/10 rounded-full blur-3xl pointer-events-none -translate-x-1/2" />
+      <div className="absolute top-1/3 right-0 w-80 h-80 bg-blue-900/10 rounded-full blur-3xl pointer-events-none translate-x-1/2" />
 
       {/* Section Header */}
       <div className="text-center max-w-3xl mx-auto mb-16">
         <div className="inline-flex items-center gap-1.5 text-xs font-mono text-cyan-400 uppercase tracking-widest mb-3">
           <Sparkles className="w-3.5 h-3.5" />
-          <span>Core Capabilities</span>
+          <span>Core Engineering Disciplines</span>
         </div>
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight font-display">
-          What We Build
+        <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight font-display uppercase">
+          Futuristic Digital Services
         </h2>
         <p className="mt-4 text-base sm:text-lg text-slate-400">
-          Digital solutions designed around your business.
+          Modular, high-performance technology capabilities engineered for ambitious businesses.
         </p>
       </div>
 
-      {/* Service Cards Grid */}
+      {/* 8 Service Cards Grid in 4 columns */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {servicesData.map((service, index) => (
           <TiltCard

@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Navbar } from './components/Navbar';
-import { CyberMatrixCanvas } from './components/CyberMatrixCanvas';
-import { BackgroundOrb } from './components/BackgroundOrb';
 import { HeroSection } from './sections/HeroSection';
+import { FutureBusinessSection } from './sections/FutureBusinessSection';
 import { ServicesSection } from './sections/ServicesSection';
+import { AITechnologySection } from './sections/AITechnologySection';
 import { SolutionsSection } from './sections/SolutionsSection';
 import { TechSection } from './sections/TechSection';
+import { StatsSection } from './sections/StatsSection';
 import { PortfolioSection } from './sections/PortfolioSection';
 import { ProcessSection } from './sections/ProcessSection';
 import { WhyUsSection } from './sections/WhyUsSection';
@@ -14,9 +15,13 @@ import { CTASection } from './sections/CTASection';
 import { ContactSection } from './sections/ContactSection';
 import { Footer } from './components/Footer';
 import { WhatsAppButton } from './components/WhatsAppButton';
+import { CustomCursor } from './components/CustomCursor';
+import { BackgroundSystem } from './components/BackgroundSystem';
+import { IntroAnimation } from './components/IntroAnimation';
 
 export default function App() {
-  const [prefilledProjectType, setPrefilledProjectType] = useState<string>('Website');
+  const [introFinished, setIntroFinished] = useState(false);
+  const [prefilledProjectType, setPrefilledProjectType] = useState<string>('Websites');
   const [prefilledMessage, setPrefilledMessage] = useState<string>('');
 
   const scrollToContact = (projectType?: string, messageNote?: string) => {
@@ -32,6 +37,13 @@ export default function App() {
     }
   };
 
+  const scrollToSolutions = () => {
+    const solutionsElem = document.getElementById('solutions');
+    if (solutionsElem) {
+      solutionsElem.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const scrollToServices = () => {
     const servicesElem = document.getElementById('services');
     if (servicesElem) {
@@ -39,52 +51,77 @@ export default function App() {
     }
   };
 
+  const scrollToWork = () => {
+    const workElem = document.getElementById('portfolio');
+    if (workElem) {
+      workElem.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#030712] text-slate-100 relative selection:bg-cyan-500/20 selection:text-cyan-300">
-      {/* Global Interactive Cyber Matrix Constellation Canvas */}
-      <CyberMatrixCanvas />
+    <div className="min-h-screen bg-[#030712] text-slate-100 relative selection:bg-cyan-500/25 selection:text-cyan-300">
+      {/* Website Entrance Cinematic Intro Animation (First-load only, <2s) */}
+      {!introFinished && (
+        <IntroAnimation onComplete={() => setIntroFinished(true)} />
+      )}
 
-      {/* Subtle Slow-Moving Translucent 3D Orbs (React Three Fiber + Motion Scroll Reaction) */}
-      <BackgroundOrb />
+      {/* Futuristic Desktop Custom Cursor System (Disabled on touch & reduced-motion) */}
+      <CustomCursor />
 
-      {/* Sticky Glassmorphic Navigation */}
-      <Navbar onOpenContact={() => scrollToContact()} />
+      {/* Multi-layered Intelligent Background System (Grid, floating particles, radial glow) */}
+      <BackgroundSystem />
 
-      {/* Main Content Sections */}
-      <main>
-        {/* 1. Hero with 3D Scene */}
+      {/* Floating Glassmorphic Sticky Navigation */}
+      <Navbar
+        onOpenContact={() => scrollToContact()}
+        onGetQuote={() => scrollToContact('Business Software', 'I would like to request an official scope estimate and technical proposal for our project.')}
+      />
+
+      {/* Main Content Progression */}
+      <main className="relative z-10">
+        {/* 1. Cinematic 3D Hero Section */}
         <HeroSection
           onStartProject={() => scrollToContact()}
-          onExploreServices={scrollToServices}
+          onExploreSolutions={scrollToSolutions}
         />
 
-        {/* 2. Services Section ("What We Build") */}
+        {/* 2. "The Future of Business is Digital" Strategic Vision */}
+        <FutureBusinessSection
+          onStartProject={() => scrollToContact('Business Software', 'We are interested in modernizing our business operations with your digital systems.')}
+        />
+
+        {/* 3. Futuristic Services Section ("What We Build") */}
         <ServicesSection
           onSelectServiceForEnquiry={(serviceTitle) => {
-            const mappedType = serviceTitle.includes('Mobile')
-              ? 'Mobile App'
-              : serviceTitle.includes('Web App')
-              ? 'Web Application'
-              : serviceTitle.includes('Business Management')
+            const mappedType = serviceTitle.includes('ANDROID')
+              ? 'Android Apps'
+              : serviceTitle.includes('iOS')
+              ? 'iOS Apps'
+              : serviceTitle.includes('WEB APPLICATIONS')
+              ? 'Web Applications'
+              : serviceTitle.includes('BUSINESS SOFTWARE')
               ? 'Business Software'
-              : serviceTitle.includes('E-Commerce')
-              ? 'E-Commerce'
               : serviceTitle.includes('AI')
-              ? 'AI Solution'
-              : serviceTitle.includes('SaaS')
+              ? 'AI Solutions'
+              : serviceTitle.includes('SAAS')
+              ? 'SaaS Platforms'
+              : serviceTitle.includes('CUSTOM')
               ? 'Custom Software'
-              : serviceTitle.includes('Custom')
-              ? 'Custom Software'
-              : 'Website';
+              : 'Websites';
 
             scrollToContact(
               mappedType,
-              `I would like to discuss our requirements for: ${serviceTitle}. Please provide architecture recommendations and a preliminary estimate.`
+              `I would like to discuss engineering requirements for: ${serviceTitle}. Please provide architecture recommendations and a preliminary estimate.`
             );
           }}
         />
 
-        {/* 3. Business Solutions Section */}
+        {/* 4. AI & Next-Gen Systems: "ENGINEERED FOR WHAT'S NEXT" */}
+        <AITechnologySection
+          onStartProject={() => scrollToContact('AI Solutions', 'I would like to discuss deploying intelligent AI workflows and cloud systems for our operations.')}
+        />
+
+        {/* 5. Turnkey Business Solutions & ERP Platforms */}
         <SolutionsSection
           onSelectSolutionForEnquiry={(solutionName) => {
             scrollToContact(
@@ -94,10 +131,13 @@ export default function App() {
           }}
         />
 
-        {/* 4. Technologies Section */}
+        {/* 6. Interactive Technology Ecosystem */}
         <TechSection />
 
-        {/* 5. Selected Projects Portfolio */}
+        {/* 7. Company Capability Statistics */}
+        <StatsSection />
+
+        {/* 8. Selected Projects & Work Portfolio */}
         <PortfolioSection
           onContactAboutSimilar={(projectTitle) => {
             scrollToContact(
@@ -105,28 +145,32 @@ export default function App() {
               `I would like to discuss building a project similar to: ${projectTitle}.`
             );
           }}
+          onViewAllProjects={() => {
+            const elem = document.getElementById('portfolio');
+            if (elem) elem.scrollIntoView({ behavior: 'smooth' });
+          }}
         />
 
-        {/* 6. Development Process Timeline */}
+        {/* 9. Interactive Development Process Timeline (01-07) */}
         <ProcessSection />
 
-        {/* 7. Why TechSoftware.digital */}
+        {/* 10. Why Businesses Choose TechSoftware.digital */}
         <WhyUsSection />
 
-        {/* 8. About TechSoftware.digital */}
+        {/* 11. Engineering Identity & Live Runtime Architecture */}
         <AboutSection onTalkWithUs={() => scrollToContact()} />
 
-        {/* 9. Large CTA Section */}
+        {/* 12. Large Futuristic CTA Section */}
         <CTASection onStartProject={() => scrollToContact()} />
 
-        {/* 10. Contact & Project Consultation Section */}
+        {/* 13. Project Consultation & Contact Section */}
         <ContactSection
           prefilledProjectType={prefilledProjectType}
           prefilledMessage={prefilledMessage}
         />
       </main>
 
-      {/* Footer */}
+      {/* Premium Minimal Footer */}
       <Footer />
 
       {/* Floating WhatsApp Action Button */}
