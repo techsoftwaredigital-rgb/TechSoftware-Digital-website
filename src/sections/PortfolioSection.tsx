@@ -22,7 +22,10 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({
     : portfolioData.filter((item) => item.category === activeCategory);
 
   return (
-    <section id="portfolio" className="relative py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section id="work" className="relative py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-24">
+      {/* Anchor for both #work and #portfolio */}
+      <div id="portfolio" className="absolute -top-24 left-0 pointer-events-none" />
+      
       {/* Background illumination */}
       <div className="absolute top-1/3 left-0 w-96 h-96 bg-blue-950/20 rounded-full blur-3xl pointer-events-none" />
 

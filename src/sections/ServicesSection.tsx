@@ -130,7 +130,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
   const [selectedService, setSelectedService] = useState<ServiceItem | null>(null);
 
   return (
-    <section id="services" className="relative py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section id="services" className="relative py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-24">
       {/* Background glow node */}
       <div className="absolute top-1/2 left-0 w-96 h-96 bg-cyan-900/10 rounded-full blur-3xl pointer-events-none -translate-x-1/2" />
       <div className="absolute top-1/3 right-0 w-80 h-80 bg-blue-900/10 rounded-full blur-3xl pointer-events-none translate-x-1/2" />

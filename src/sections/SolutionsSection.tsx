@@ -61,7 +61,7 @@ export const SolutionsSection: React.FC<SolutionsSectionProps> = ({
   }, [searchQuery, selectedCategory]);
 
   return (
-    <section id="solutions" className="relative py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section id="solutions" className="relative py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-24">
       {/* Background radial glow */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-full max-w-4xl h-96 bg-indigo-950/15 rounded-full blur-3xl pointer-events-none" />
 

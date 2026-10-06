@@ -16,12 +16,15 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContact, onGetQuote }) => 
       setScrolled(window.scrollY > 20);
 
       // Active section spy
-      const sections = ['home', 'solutions', 'services', 'work', 'about', 'contact'];
+      const sections = ['home', 'services', 'solutions', 'work', 'about', 'contact'];
       for (const sectionId of sections) {
-        const elem = document.getElementById(sectionId);
+        let elem = document.getElementById(sectionId);
+        if (!elem && sectionId === 'work') {
+          elem = document.getElementById('portfolio');
+        }
         if (elem) {
           const rect = elem.getBoundingClientRect();
-          if (rect.top <= 200 && rect.bottom >= 200) {
+          if (rect.top <= 250 && rect.bottom >= 150) {
             setActiveSection(sectionId);
             break;
           }
@@ -35,19 +38,26 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContact, onGetQuote }) => 
 
   const navLinks = [
     { label: 'HOME', href: '#home', id: 'home' },
-    { label: 'SOLUTIONS', href: '#solutions', id: 'solutions' },
     { label: 'SERVICES', href: '#services', id: 'services' },
-    { label: 'WORK', href: '#portfolio', id: 'work' },
+    { label: 'SOLUTIONS', href: '#solutions', id: 'solutions' },
+    { label: 'WORK', href: '#work', id: 'work' },
     { label: 'ABOUT', href: '#about', id: 'about' },
     { label: 'CONTACT', href: '#contact', id: 'contact' },
   ];
 
   const handleNavClick = (href: string) => {
     setMobileMenuOpen(false);
-    const target = document.querySelector(href);
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth' });
-    }
+    setTimeout(() => {
+      let target = document.querySelector(href);
+      if (!target && href === '#work') {
+        target = document.querySelector('#portfolio');
+      } else if (!target && href === '#portfolio') {
+        target = document.querySelector('#work');
+      }
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 60);
   };
 
   const handleQuoteClick = () => {

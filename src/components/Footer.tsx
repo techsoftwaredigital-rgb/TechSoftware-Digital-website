@@ -65,16 +65,26 @@ export const Footer: React.FC = () => {
               Navigation
             </h4>
             <ul className="space-y-2">
-              {['Home', 'Services', 'Solutions', 'Technologies', 'Portfolio', 'Process', 'About', 'Contact'].map((item) => (
-                <li key={item}>
-                  <a
-                    href={`#${item.toLowerCase()}`}
-                    className="hover:text-cyan-400 transition-colors"
-                  >
-                    {item}
-                  </a>
-                </li>
-              ))}
+              {['Home', 'Services', 'Solutions', 'Technologies', 'Portfolio', 'Process', 'About', 'Contact'].map((item) => {
+                const targetId = item.toLowerCase() === 'portfolio' ? '#work' : `#${item.toLowerCase()}`;
+                return (
+                  <li key={item}>
+                    <a
+                      href={targetId}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        const elem = document.querySelector(targetId) || (targetId === '#work' ? document.querySelector('#portfolio') : null);
+                        if (elem) {
+                          elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                      }}
+                      className="hover:text-cyan-400 transition-colors cursor-pointer"
+                    >
+                      {item === 'Portfolio' ? 'Work (Portfolio)' : item}
+                    </a>
+                  </li>
+                );
+              })}
             </ul>
           </div>
 

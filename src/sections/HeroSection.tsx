@@ -14,7 +14,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   return (
     <section
       id="home"
-      className="relative min-h-[96vh] lg:min-h-screen flex items-center justify-center pt-28 pb-16 overflow-hidden select-none"
+      className="relative min-h-[96vh] lg:min-h-screen flex items-center justify-center pt-28 pb-16 overflow-hidden select-none scroll-mt-24"
     >
       {/* Interactive 3D WebGL Digital Core Background Scene */}
       <Scene3D />

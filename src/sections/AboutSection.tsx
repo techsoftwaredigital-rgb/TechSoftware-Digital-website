@@ -23,7 +23,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onTalkWithUs }) => {
   ];
 
   return (
-    <section id="about" className="relative py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section id="about" className="relative py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-24">
       {/* Background illumination */}
       <div className="absolute top-1/2 right-10 w-96 h-96 bg-blue-950/20 rounded-full blur-3xl pointer-events-none" />
 
