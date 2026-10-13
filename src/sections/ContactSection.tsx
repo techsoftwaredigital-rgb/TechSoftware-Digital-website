@@ -10,18 +10,27 @@ import {
   Sparkles,
   ArrowRight,
   ShieldCheck,
+  Loader2,
+  RefreshCw,
 } from 'lucide-react';
+import {
+  submitLeadToGoogleSheet,
+  InquiryType,
+  GOOGLE_SHEET_WEBHOOK_URL,
+} from '../services/leadSubmissionService';
 
 interface ContactSectionProps {
   prefilledProjectType?: string;
   prefilledMessage?: string;
+  initialIntent?: InquiryType;
 }
 
 export const ContactSection: React.FC<ContactSectionProps> = ({
   prefilledProjectType = '',
   prefilledMessage = '',
+  initialIntent = 'Start Your Project',
 }) => {
-  const [activeIntent, setActiveIntent] = useState<'START YOUR PROJECT' | 'GET A QUOTE' | 'CONTACT US'>('START YOUR PROJECT');
+  const [activeIntent, setActiveIntent] = useState<InquiryType>(initialIntent);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -37,6 +46,13 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submissionRef, setSubmissionRef] = useState('');
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (initialIntent) {
+      setActiveIntent(initialIntent);
+    }
+  }, [initialIntent]);
 
   useEffect(() => {
     if (prefilledProjectType) {
@@ -88,14 +104,30 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
     } else if (!/^[0-9+-\s()]{8,15}$/.test(formData.phone.trim())) {
       errs.phone = 'Please enter a valid contact phone number (at least 8 digits).';
     }
-    if (!formData.message.trim() || formData.message.trim().length < 8) {
-      errs.message = 'Please provide brief requirements about what you would like to build.';
+    if (!formData.message.trim() || formData.message.trim().length < 5) {
+      errs.message = 'Please provide a message or requirements summary.';
     }
+
+    // Project Type and Budget are required for "Start Your Project" and "Get A Quote", optional for "Contact Us"
+    if (activeIntent !== 'Contact Us') {
+      if (!formData.projectType.trim()) {
+        errs.projectType = 'Please select a project category.';
+      }
+      if (!formData.budgetRange.trim()) {
+        errs.budgetRange = 'Please select an estimated budget range.';
+      }
+    }
+
     return errs;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Prevent duplicate submissions while in flight
+    if (isSubmitting) return;
+
+    setSubmitError(null);
     const validationErrors = validate();
     setErrors(validationErrors);
 
@@ -105,22 +137,72 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
 
     setIsSubmitting(true);
 
-    setTimeout(() => {
+    try {
+      const result = await submitLeadToGoogleSheet({
+        inquiryType: activeIntent,
+        name: formData.name,
+        phone: formData.phone,
+        email: formData.email,
+        company: formData.companyName,
+        projectType: activeIntent === 'Contact Us' && !formData.projectType ? 'General Inquiry' : formData.projectType,
+        budget: activeIntent === 'Contact Us' && !formData.budgetRange ? 'General Discussion' : formData.budgetRange,
+        message: formData.message,
+        source: 'TechSoftware.digital Website',
+      });
+
+      if (result.success) {
+        setIsSubmitted(true);
+        setSubmissionRef(result.referenceToken);
+        // Reset form data upon successful submission
+        setFormData({
+          name: '',
+          companyName: '',
+          phone: '',
+          email: '',
+          projectType: 'Websites',
+          budgetRange: '₹50,000 – ₹1,00,000',
+          message: '',
+        });
+        setErrors({});
+      } else {
+        setSubmitError(
+          'Unable to submit your request right now. Please try again or contact us directly.'
+        );
+      }
+    } catch (err) {
+      console.error('Submission failed:', err);
+      setSubmitError(
+        'Unable to submit your request right now. Please try again or contact us directly.'
+      );
+    } finally {
       setIsSubmitting(false);
-      setIsSubmitted(true);
-      setSubmissionRef(`TS-${Date.now().toString().slice(-6)}`);
-    }, 750);
+    }
   };
 
   const handleWhatsAppRedirect = () => {
     const text = encodeURIComponent(
-      `Hello TechSoftware.digital!\n\nIntent: ${activeIntent}\nName: ${formData.name}\nCompany: ${
+      `Hello TechSoftware.digital!\n\nInquiry Type: ${activeIntent}\nName: ${formData.name || 'Client'}\nCompany: ${
         formData.companyName || 'N/A'
-      }\nProject: ${formData.projectType}\nBudget: ${formData.budgetRange}\nMessage: ${
-        formData.message
+      }\nProject: ${formData.projectType || 'General Inquiry'}\nBudget: ${formData.budgetRange || 'N/A'}\nMessage: ${
+        formData.message || 'Consultation request'
       }`
     );
     window.open(`https://wa.me/918169401877?text=${text}`, '_blank');
+  };
+
+  const handleResetForNewSubmission = () => {
+    setIsSubmitted(false);
+    setSubmitError(null);
+    setErrors({});
+    setFormData({
+      name: '',
+      companyName: '',
+      phone: '',
+      email: '',
+      projectType: 'Websites',
+      budgetRange: '₹50,000 – ₹1,00,000',
+      message: '',
+    });
   };
 
   return (
@@ -138,29 +220,38 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
           LET'S BUILD WHAT'S NEXT.
         </h2>
         <p className="mt-4 text-base sm:text-lg text-slate-400">
-          Connect directly with our engineering team. We review every specification within 24 business hours.
+          Connect directly with our engineering team. All submissions automatically route to our client portal for review within 24 business hours.
         </p>
 
-        {/* 3 Intent Mode Buttons */}
+        {/* 3 Inquiry Type Mode Buttons */}
         <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
-          {(['START YOUR PROJECT', 'GET A QUOTE', 'CONTACT US'] as const).map((intent) => (
+          {(
+            [
+              { label: 'START YOUR PROJECT', value: 'Start Your Project' as InquiryType },
+              { label: 'GET A QUOTE', value: 'Get A Quote' as InquiryType },
+              { label: 'CONTACT US', value: 'Contact Us' as InquiryType },
+            ] as const
+          ).map((item) => (
             <button
-              key={intent}
-              onClick={() => setActiveIntent(intent)}
+              key={item.value}
+              type="button"
+              onClick={() => {
+                setActiveIntent(item.value);
+                setSubmitError(null);
+              }}
               className={`px-4 py-2 text-xs font-mono font-semibold uppercase tracking-wider rounded-xl transition-all cursor-pointer ${
-                activeIntent === intent
+                activeIntent === item.value
                   ? 'bg-cyan-400 text-black shadow-lg shadow-cyan-500/25 scale-105'
                   : 'bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800 hover:bg-slate-800'
               }`}
             >
-              {intent}
+              {item.label}
             </button>
           ))}
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-        
         {/* Left Information Card */}
         <div className="lg:col-span-5 space-y-6">
           <div className="p-7 sm:p-8 rounded-2xl glass-panel border border-slate-800">
@@ -229,31 +320,42 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
         {/* Right Form Card */}
         <div className="lg:col-span-7">
           <div className="p-7 sm:p-9 rounded-2xl glass-panel border border-slate-800 relative">
-            
             {isSubmitted ? (
               <div className="py-10 text-center space-y-5 animate-in fade-in zoom-in-95 duration-300">
                 <div className="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 mx-auto flex items-center justify-center shadow-lg shadow-emerald-950">
                   <CheckCircle2 className="w-8 h-8" />
                 </div>
 
-                <div className="space-y-2">
-                  <h3 className="text-2xl font-bold font-display text-white">
-                    Project Brief Received Successfully!
+                <div className="space-y-3">
+                  <h3 className="text-2xl sm:text-3xl font-bold font-display text-white">
+                    Thank you! Your request has been received.
                   </h3>
-                  <p className="text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
-                    Thank you, <span className="text-cyan-300 font-semibold">{formData.name}</span>. Our technical leads have received your specifications for{' '}
-                    <span className="text-cyan-300 font-semibold">{formData.projectType}</span> and will review your requirements immediately.
+                  <p className="text-sm sm:text-base text-cyan-300 font-medium max-w-md mx-auto leading-relaxed">
+                    Our team will contact you shortly.
+                  </p>
+                  <p className="text-xs text-slate-400 max-w-md mx-auto">
+                    Your <span className="text-white font-mono">{activeIntent}</span> inquiry has been recorded and assigned to a solutions engineer.
                   </p>
                 </div>
 
-                <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 text-xs font-mono text-left max-w-md mx-auto space-y-1 text-slate-400">
-                  <div>Reference Token: <span className="text-cyan-400">{submissionRef}</span></div>
-                  <div>Direct Phone: <span className="text-white">{formData.phone}</span></div>
-                  <div>Estimated Scope: <span className="text-white">{formData.budgetRange}</span></div>
+                <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 text-xs font-mono text-left max-w-md mx-auto space-y-1.5 text-slate-400">
+                  <div className="flex justify-between items-center pb-1.5 border-b border-slate-800 text-[11px]">
+                    <span className="text-slate-500 uppercase">Inquiry Type:</span>
+                    <span className="text-cyan-400 font-semibold">{activeIntent}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-[11px]">
+                    <span className="text-slate-500 uppercase">Tracking Ref:</span>
+                    <span className="text-white font-semibold">{submissionRef}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-[11px]">
+                    <span className="text-slate-500 uppercase">Destination Sheet:</span>
+                    <span className="text-emerald-400 font-semibold">Website Leads</span>
+                  </div>
                 </div>
 
                 <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
                   <button
+                    type="button"
                     onClick={handleWhatsAppRedirect}
                     className="w-full sm:w-auto px-6 py-3 text-xs font-semibold uppercase tracking-wider text-black bg-[#25D366] hover:bg-[#20bd5a] rounded-lg shadow-lg flex items-center justify-center gap-2 transition-all cursor-pointer"
                   >
@@ -262,26 +364,43 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                   </button>
 
                   <button
-                    onClick={() => {
-                      setIsSubmitted(false);
-                      setFormData({
-                        name: '',
-                        companyName: '',
-                        phone: '',
-                        email: '',
-                        projectType: 'Websites',
-                        budgetRange: '₹50,000 – ₹1,00,000',
-                        message: '',
-                      });
-                    }}
-                    className="w-full sm:w-auto px-4 py-3 text-xs font-medium text-slate-400 hover:text-white transition-colors cursor-pointer"
+                    type="button"
+                    onClick={handleResetForNewSubmission}
+                    className="w-full sm:w-auto px-4 py-3 text-xs font-medium text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center gap-1.5"
                   >
-                    Submit Another Brief
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    <span>Submit Another Request</span>
                   </button>
                 </div>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+                {/* Active Mode Banner */}
+                <div className="flex items-center justify-between pb-3 border-b border-slate-800 text-xs font-mono">
+                  <span className="text-slate-400 uppercase">Form Mode:</span>
+                  <span className="text-cyan-400 font-semibold flex items-center gap-1.5">
+                    <Sparkles className="w-3 h-3 text-cyan-400" />
+                    {activeIntent}
+                  </span>
+                </div>
+
+                {/* Error Banner if submission fails */}
+                {submitError && (
+                  <div className="p-4 rounded-xl bg-rose-950/40 border border-rose-500/40 text-rose-300 text-xs flex items-start gap-3 animate-in fade-in duration-200">
+                    <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                    <div className="space-y-1">
+                      <p className="font-semibold">{submitError}</p>
+                      <p className="text-[11px] text-rose-300/80">
+                        You can also reach us immediately by phone at{' '}
+                        <a href="tel:8169401877" className="underline font-bold text-white">
+                          8169401877
+                        </a>{' '}
+                        or on WhatsApp.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Name */}
                   <div>
@@ -295,7 +414,8 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                       onChange={(e) =>
                         setFormData({ ...formData, name: e.target.value })
                       }
-                      className={`w-full px-3.5 py-2.5 bg-slate-900/90 border rounded-xl text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 transition-colors ${
+                      disabled={isSubmitting}
+                      className={`w-full px-3.5 py-2.5 bg-slate-900/90 border rounded-xl text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 transition-colors disabled:opacity-60 ${
                         errors.name
                           ? 'border-rose-500/80 focus:ring-rose-500'
                           : 'border-slate-700/80 focus:border-cyan-400 focus:ring-cyan-400'
@@ -321,7 +441,8 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                       onChange={(e) =>
                         setFormData({ ...formData, companyName: e.target.value })
                       }
-                      className="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/80 rounded-xl text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-colors"
+                      disabled={isSubmitting}
+                      className="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/80 rounded-xl text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-colors disabled:opacity-60"
                     />
                   </div>
                 </div>
@@ -339,7 +460,8 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                       onChange={(e) =>
                         setFormData({ ...formData, phone: e.target.value })
                       }
-                      className={`w-full px-3.5 py-2.5 bg-slate-900/90 border rounded-xl text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 transition-colors ${
+                      disabled={isSubmitting}
+                      className={`w-full px-3.5 py-2.5 bg-slate-900/90 border rounded-xl text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 transition-colors disabled:opacity-60 ${
                         errors.phone
                           ? 'border-rose-500/80 focus:ring-rose-500'
                           : 'border-slate-700/80 focus:border-cyan-400 focus:ring-cyan-400'
@@ -365,7 +487,8 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                       onChange={(e) =>
                         setFormData({ ...formData, email: e.target.value })
                       }
-                      className={`w-full px-3.5 py-2.5 bg-slate-900/90 border rounded-xl text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 transition-colors ${
+                      disabled={isSubmitting}
+                      className={`w-full px-3.5 py-2.5 bg-slate-900/90 border rounded-xl text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 transition-colors disabled:opacity-60 ${
                         errors.email
                           ? 'border-rose-500/80 focus:ring-rose-500'
                           : 'border-slate-700/80 focus:border-cyan-400 focus:ring-cyan-400'
@@ -383,16 +506,29 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Project Type */}
                   <div>
-                    <label className="block text-xs font-mono text-slate-300 mb-1.5 uppercase tracking-wider">
-                      Project Type <span className="text-cyan-400">*</span>
+                    <label className="block text-xs font-mono text-slate-300 mb-1.5 uppercase tracking-wider flex items-center justify-between">
+                      <span>
+                        Project Type{' '}
+                        {activeIntent === 'Contact Us' ? (
+                          <span className="text-slate-500 font-normal">(Optional)</span>
+                        ) : (
+                          <span className="text-cyan-400">*</span>
+                        )}
+                      </span>
                     </label>
                     <select
                       value={formData.projectType}
                       onChange={(e) =>
                         setFormData({ ...formData, projectType: e.target.value })
                       }
-                      className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700/80 rounded-xl text-xs sm:text-sm text-slate-100 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-colors cursor-pointer"
+                      disabled={isSubmitting}
+                      className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700/80 rounded-xl text-xs sm:text-sm text-slate-100 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-colors cursor-pointer disabled:opacity-60"
                     >
+                      {activeIntent === 'Contact Us' && (
+                        <option value="General Inquiry" className="bg-slate-900 text-slate-100">
+                          General Inquiry
+                        </option>
+                      )}
                       {projectTypes.map((type) => (
                         <option key={type} value={type} className="bg-slate-900 text-slate-100">
                           {type}
@@ -403,16 +539,29 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
 
                   {/* Budget Range */}
                   <div>
-                    <label className="block text-xs font-mono text-slate-300 mb-1.5 uppercase tracking-wider">
-                      Budget Range <span className="text-cyan-400">*</span>
+                    <label className="block text-xs font-mono text-slate-300 mb-1.5 uppercase tracking-wider flex items-center justify-between">
+                      <span>
+                        Budget Range{' '}
+                        {activeIntent === 'Contact Us' ? (
+                          <span className="text-slate-500 font-normal">(Optional)</span>
+                        ) : (
+                          <span className="text-cyan-400">*</span>
+                        )}
+                      </span>
                     </label>
                     <select
                       value={formData.budgetRange}
                       onChange={(e) =>
                         setFormData({ ...formData, budgetRange: e.target.value })
                       }
-                      className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700/80 rounded-xl text-xs sm:text-sm text-slate-100 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-colors cursor-pointer"
+                      disabled={isSubmitting}
+                      className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700/80 rounded-xl text-xs sm:text-sm text-slate-100 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-colors cursor-pointer disabled:opacity-60"
                     >
+                      {activeIntent === 'Contact Us' && (
+                        <option value="General Discussion" className="bg-slate-900 text-slate-100">
+                          General Discussion
+                        </option>
+                      )}
                       {budgetRanges.map((range) => (
                         <option key={range} value={range} className="bg-slate-900 text-slate-100">
                           {range}
@@ -429,12 +578,19 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                   </label>
                   <textarea
                     rows={4}
-                    placeholder="Describe what you want to build, existing systems, key features or timeline..."
+                    placeholder={
+                      activeIntent === 'Get A Quote'
+                        ? 'Describe your project scope, features, desired launch date, and technical preferences for quote calculation...'
+                        : activeIntent === 'Start Your Project'
+                        ? 'Describe what you want to build, existing systems, key features, architecture, or timelines...'
+                        : 'How can our technology team assist your company today?'
+                    }
                     value={formData.message}
                     onChange={(e) =>
                       setFormData({ ...formData, message: e.target.value })
                     }
-                    className={`w-full px-3.5 py-2.5 bg-slate-900/90 border rounded-xl text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 transition-colors ${
+                    disabled={isSubmitting}
+                    className={`w-full px-3.5 py-2.5 bg-slate-900/90 border rounded-xl text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 transition-colors disabled:opacity-60 ${
                       errors.message
                         ? 'border-rose-500/80 focus:ring-rose-500'
                         : 'border-slate-700/80 focus:border-cyan-400 focus:ring-cyan-400'
@@ -448,20 +604,31 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                   )}
                 </div>
 
-                {/* Submit Button with light sweep & ripple */}
+                {/* Submit Button with light sweep, futuristic state & ripple */}
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="group relative overflow-hidden w-full py-4 px-6 text-xs sm:text-sm font-semibold uppercase tracking-wider text-black bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-400 hover:from-cyan-300 hover:to-blue-300 rounded-xl shadow-lg shadow-cyan-500/25 hover:shadow-cyan-400/40 hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="group relative overflow-hidden w-full py-4 px-6 text-xs sm:text-sm font-semibold uppercase tracking-wider text-black bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-400 hover:from-cyan-300 hover:to-blue-300 rounded-xl shadow-lg shadow-cyan-500/25 hover:shadow-cyan-400/40 hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
                 >
                   <span className="absolute top-0 -left-[100%] w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:left-[100%] transition-all duration-700 pointer-events-none" />
 
                   {isSubmitting ? (
-                    <span>Validating & Transmitting Brief...</span>
+                    <div className="flex items-center gap-2.5 text-black">
+                      <Loader2 className="w-4 h-4 animate-spin text-black" />
+                      <span className="font-mono tracking-wider">
+                        Transmitting to Website Leads...
+                      </span>
+                    </div>
                   ) : (
                     <>
-                      <span>{activeIntent === 'GET A QUOTE' ? 'Request Official Estimate' : activeIntent === 'START YOUR PROJECT' ? 'Start Your Project' : 'Transmit Consultation Brief'}</span>
-                      <Send className="w-4 h-4" />
+                      <span>
+                        {activeIntent === 'Get A Quote'
+                          ? 'Submit Quote Request'
+                          : activeIntent === 'Start Your Project'
+                          ? 'Start Your Project'
+                          : 'Send Message'}
+                      </span>
+                      <Send className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                     </>
                   )}
                 </button>

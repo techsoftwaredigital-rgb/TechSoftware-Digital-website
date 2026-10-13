@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 
 interface MagneticButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
@@ -15,7 +15,6 @@ export const MagneticButton: React.FC<MagneticButtonProps> = ({
   ...props
 }) => {
   const btnRef = useRef<HTMLButtonElement>(null);
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
 
   const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (!btnRef.current) return;
@@ -23,14 +22,15 @@ export const MagneticButton: React.FC<MagneticButtonProps> = ({
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
 
-    const deltaX = (e.clientX - centerX) * 0.25;
-    const deltaY = (e.clientY - centerY) * 0.25;
+    const deltaX = (e.clientX - centerX) * 0.22;
+    const deltaY = (e.clientY - centerY) * 0.22;
 
-    setOffset({ x: deltaX, y: deltaY });
+    btnRef.current.style.transform = `translate3d(${deltaX}px, ${deltaY}px, 0)`;
   };
 
   const handleMouseLeave = () => {
-    setOffset({ x: 0, y: 0 });
+    if (!btnRef.current) return;
+    btnRef.current.style.transform = 'translate3d(0px, 0px, 0)';
   };
 
   const getVariantStyles = () => {
@@ -53,16 +53,14 @@ export const MagneticButton: React.FC<MagneticButtonProps> = ({
       onMouseLeave={handleMouseLeave}
       onClick={onClick}
       style={{
-        transform: `translate3d(${offset.x}px, ${offset.y}px, 0)`,
-        transition: 'transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s ease, background-color 0.2s ease',
+        transition: 'transform 0.15s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s ease, background-color 0.2s ease',
       }}
-      className={`relative group button-light-sweep overflow-hidden px-6 py-3 rounded-xl font-semibold text-xs sm:text-sm tracking-wide uppercase font-display active:scale-[0.97] transition-all cursor-pointer inline-flex items-center justify-center gap-2 ${getVariantStyles()} ${className}`}
+      className={`relative group button-light-sweep overflow-hidden px-6 py-3 rounded-xl font-semibold text-xs sm:text-sm tracking-wide uppercase font-display active:scale-[0.97] will-change-transform cursor-pointer inline-flex items-center justify-center gap-2 ${getVariantStyles()} ${className}`}
       {...props}
     >
-      {/* Dynamic glow aura */}
-      <span className="relative z-10 flex items-center justify-center gap-2">
-        {children}
-      </span>
+      {/* Light sweep beam */}
+      <span className="absolute top-0 -left-[100%] w-full h-full bg-gradient-to-r from-transparent via-white/35 to-transparent group-hover:left-[100%] transition-all duration-700 pointer-events-none" />
+      {children}
     </button>
   );
 };

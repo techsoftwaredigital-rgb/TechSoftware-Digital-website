@@ -47,6 +47,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContact, onGetQuote }) => 
 
   const handleNavClick = (href: string) => {
     setMobileMenuOpen(false);
+    if (href === '#contact' && onOpenContact) {
+      onOpenContact();
+      return;
+    }
     setTimeout(() => {
       let target = document.querySelector(href);
       if (!target && href === '#work') {

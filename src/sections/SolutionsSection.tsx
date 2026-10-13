@@ -150,6 +150,10 @@ export const SolutionsSection: React.FC<SolutionsSectionProps> = ({
                     <img
                       src={solution.imageUrl}
                       alt={solution.name}
+                      loading="lazy"
+                      decoding="async"
+                      width={500}
+                      height={280}
                       referrerPolicy="no-referrer"
                       className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                     />

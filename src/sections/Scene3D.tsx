@@ -6,7 +6,6 @@ export const Scene3D: React.FC = () => {
   const { prefersReducedMotion } = useMotionPreference();
   const containerRef = useRef<HTMLDivElement>(null);
   const [webglSupported, setWebglSupported] = useState(true);
-  const [isLowPerformance, setIsLowPerformance] = useState(false);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -26,7 +25,6 @@ export const Scene3D: React.FC = () => {
     }
 
     const isMobile = window.innerWidth < 768;
-    setIsLowPerformance(isMobile);
 
     const width = container.clientWidth || window.innerWidth;
     const height = container.clientHeight || window.innerHeight;
@@ -52,7 +50,8 @@ export const Scene3D: React.FC = () => {
     }
 
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.25 : 1.75));
+    // Cap pixel ratio to 1.0 on mobile and 1.5 on desktop to protect GPU fillrate
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobile ? 1.0 : 1.5));
     renderer.setClearColor(0x000000, 0);
     container.appendChild(renderer.domElement);
 
@@ -62,7 +61,6 @@ export const Scene3D: React.FC = () => {
 
     // 1. Digital Wireframe Sphere (Futuristic Core)
     const sphereRadius = isMobile ? 2.4 : 3.0;
-    const sphereSegments = isMobile ? 14 : 22;
 
     const sphereGeom = new THREE.IcosahedronGeometry(sphereRadius, isMobile ? 2 : 3);
     const wireframeMat = new THREE.MeshBasicMaterial({
@@ -139,7 +137,7 @@ export const Scene3D: React.FC = () => {
     masterGroup.add(nodes);
 
     // 3. Floating Surrounding Ambient Particles
-    const ambientCount = isMobile ? 90 : 220;
+    const ambientCount = isMobile ? 70 : 150;
     const ambientPositions = new Float32Array(ambientCount * 3);
     const ambientSpeeds: { vx: number; vy: number; vz: number }[] = [];
 
@@ -158,6 +156,7 @@ export const Scene3D: React.FC = () => {
 
     const ambientGeom = new THREE.BufferGeometry();
     ambientGeom.setAttribute('position', new THREE.BufferAttribute(ambientPositions, 3));
+
     const ambientMat = new THREE.PointsMaterial({
       size: isMobile ? 0.12 : 0.18,
       map: particleTexture,
@@ -171,7 +170,7 @@ export const Scene3D: React.FC = () => {
     scene.add(ambientPoints);
 
     // 4. Subtle Orbital Tech Ring with Glowing Lines
-    const ringGeom = new THREE.RingGeometry(sphereRadius * 1.35, sphereRadius * 1.37, isMobile ? 32 : 64);
+    const ringGeom = new THREE.RingGeometry(sphereRadius * 1.35, sphereRadius * 1.37, isMobile ? 32 : 50);
     const ringMat = new THREE.MeshBasicMaterial({
       color: 0x06b6d4,
       side: THREE.DoubleSide,
@@ -182,7 +181,7 @@ export const Scene3D: React.FC = () => {
     orbitalRing.rotation.x = Math.PI / 3;
     masterGroup.add(orbitalRing);
 
-    const secondRingGeom = new THREE.RingGeometry(sphereRadius * 1.7, sphereRadius * 1.715, isMobile ? 32 : 64);
+    const secondRingGeom = new THREE.RingGeometry(sphereRadius * 1.7, sphereRadius * 1.715, isMobile ? 32 : 50);
     const secondRingMat = new THREE.MeshBasicMaterial({
       color: 0x8b5cf6,
       side: THREE.DoubleSide,
@@ -196,7 +195,7 @@ export const Scene3D: React.FC = () => {
 
     // 5. Small Floating Tech Elements (Hexagonal micro prisms)
     const techElementsGroup = new THREE.Group();
-    const techCount = isMobile ? 4 : 7;
+    const techCount = isMobile ? 3 : 6;
     const techMeshes: THREE.Mesh[] = [];
 
     const hexGeom = new THREE.CylinderGeometry(0.18, 0.18, 0.06, 6);
@@ -261,17 +260,23 @@ export const Scene3D: React.FC = () => {
 
     window.addEventListener('resize', handleResize);
 
-    // Animation Loop
-    let animationFrameId: number;
-    let clock = new THREE.Clock();
+    // Animation Loop with IntersectionObserver & Page Visibility controls
+    let animationFrameId: number = 0;
+    let isVisible = true;
+    let isDocumentVisible = !document.hidden;
+    const clock = new THREE.Clock();
 
     const animate = () => {
+      if (!isVisible || !isDocumentVisible) {
+        animationFrameId = 0;
+        return;
+      }
+
       animationFrameId = requestAnimationFrame(animate);
 
-      const delta = clock.getDelta();
       const elapsedTime = clock.getElapsedTime();
 
-      // Smooth camera / group rotation via mouse lerp (disabled or muted if user prefers reduced motion)
+      // Smooth camera / group rotation via mouse lerp
       if (prefersReducedMotion) {
         masterGroup.rotation.y += 0.0006;
         masterGroup.rotation.x = 0;
@@ -312,7 +317,6 @@ export const Scene3D: React.FC = () => {
           positions[idx + 1] += ambientSpeeds[i].vy;
           positions[idx + 2] += ambientSpeeds[i].vz;
 
-          // Wrap around boundaries
           const limit = isMobile ? 8 : 10;
           if (positions[idx] > limit) positions[idx] = -limit;
           if (positions[idx] < -limit) positions[idx] = limit;
@@ -323,20 +327,55 @@ export const Scene3D: React.FC = () => {
       }
 
       camera.lookAt(0, 0, 0);
-
       renderer.render(scene, camera);
     };
 
+    // Pause rendering when hero is off-screen using IntersectionObserver
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        isVisible = entry.isIntersecting;
+        if (isVisible && !animationFrameId && isDocumentVisible) {
+          clock.start();
+          animate();
+        } else if (!isVisible && animationFrameId) {
+          cancelAnimationFrame(animationFrameId);
+          animationFrameId = 0;
+        }
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(container);
+
+    // Pause rendering when browser tab is inactive
+    const handleVisibilityChange = () => {
+      isDocumentVisible = !document.hidden;
+      if (isDocumentVisible && isVisible && !animationFrameId) {
+        clock.start();
+        animate();
+      } else if (!isDocumentVisible && animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = 0;
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Initial render
     animate();
 
     // Context Lost / Restored handling
     const handleContextLost = (event: Event) => {
       event.preventDefault();
-      cancelAnimationFrame(animationFrameId);
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = 0;
+      }
     };
 
     const handleContextRestored = () => {
-      animate();
+      if (isVisible && isDocumentVisible && !animationFrameId) {
+        animate();
+      }
     };
 
     const canvasElem = renderer.domElement;
@@ -344,14 +383,18 @@ export const Scene3D: React.FC = () => {
     canvasElem.addEventListener('webglcontextrestored', handleContextRestored, false);
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('resize', handleResize);
       canvasElem.removeEventListener('webglcontextlost', handleContextLost);
       canvasElem.removeEventListener('webglcontextrestored', handleContextRestored);
 
-      if (container && renderer.domElement) {
+      if (container && renderer.domElement && container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
       }
 
@@ -373,7 +416,7 @@ export const Scene3D: React.FC = () => {
       particleTexture.dispose();
       renderer.dispose();
     };
-  }, []);
+  }, [prefersReducedMotion]);
 
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">

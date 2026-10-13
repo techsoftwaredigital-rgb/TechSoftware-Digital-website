@@ -26,7 +26,7 @@ export const portfolioData: ProjectItem[] = [
     demoUrl: 'https://ts-devloper.web.app/',
     gradient: 'from-blue-600/30 via-cyan-500/20 to-slate-900/80',
     accent: '#06b6d4',
-    imageUrl: '/src/assets/images/portfolio_saas_dashboard_1791023083898.jpg'
+    imageUrl: '/assets/images/portfolio_saas_dashboard_1791023083898.jpg'
   },
   {
     id: 'neural-ai-pipeline',
@@ -40,7 +40,7 @@ export const portfolioData: ProjectItem[] = [
     demoUrl: 'https://ts-devloper.web.app/',
     gradient: 'from-purple-600/30 via-indigo-500/20 to-slate-900/80',
     accent: '#a855f7',
-    imageUrl: '/src/assets/images/portfolio_ai_enterprise_1791023094858.jpg'
+    imageUrl: '/assets/images/portfolio_ai_enterprise_1791023094858.jpg'
   },
   {
     id: 'novapay-mobile-fintech',
@@ -54,7 +54,7 @@ export const portfolioData: ProjectItem[] = [
     demoUrl: 'https://ts-devloper.web.app/',
     gradient: 'from-emerald-600/30 via-teal-500/20 to-slate-900/80',
     accent: '#10b981',
-    imageUrl: '/src/assets/images/portfolio_fintech_mobile_1791023106605.jpg'
+    imageUrl: '/assets/images/portfolio_fintech_mobile_1791023106605.jpg'
   },
   {
     id: 'zenith-architecture-portal',
@@ -68,7 +68,7 @@ export const portfolioData: ProjectItem[] = [
     demoUrl: 'https://ts-devloper.web.app/',
     gradient: 'from-cyan-600/30 via-blue-500/20 to-slate-900/80',
     accent: '#06b6d4',
-    imageUrl: '/src/assets/images/hero_neural_core_1791023116628.jpg'
+    imageUrl: '/assets/images/hero_neural_core_1791023116628.jpg'
   },
   {
     id: 'solaris-health-portal',
@@ -81,7 +81,8 @@ export const portfolioData: ProjectItem[] = [
     clientIndustry: 'Healthcare & Wellness',
     demoUrl: 'https://ts-devloper.web.app/',
     gradient: 'from-sky-600/30 via-cyan-500/20 to-slate-900/80',
-    accent: '#38bdf8'
+    accent: '#38bdf8',
+    imageUrl: '/assets/images/solution_erp_operations_1791023763347.jpg'
   },
   {
     id: 'vortex-b2b-procure',
@@ -94,6 +95,7 @@ export const portfolioData: ProjectItem[] = [
     clientIndustry: 'Heavy Manufacturing & OEM',
     demoUrl: 'https://ts-devloper.web.app/',
     gradient: 'from-amber-600/30 via-orange-500/20 to-slate-900/80',
-    accent: '#f59e0b'
+    accent: '#f59e0b',
+    imageUrl: '/assets/images/solution_crm_sales_1791023745384.jpg'
   }
 ];

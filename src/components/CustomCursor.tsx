@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useMotionPreference } from '../context/MotionPreferenceContext';
 
 export const CustomCursor: React.FC = () => {
   const { prefersReducedMotion } = useMotionPreference();
-  const [position, setPosition] = useState({ x: -100, y: -100 });
-  const [trailPos, setTrailPos] = useState({ x: -100, y: -100 });
   const [cursorState, setCursorState] = useState<'default' | 'button' | 'link' | 'card'>('default');
   const [isVisible, setIsVisible] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(true);
+
+  const dotRef = useRef<HTMLDivElement>(null);
+  const ringRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Check if device supports fine hover and pointer (i.e. mouse, not touch screen)
@@ -24,46 +25,62 @@ export const CustomCursor: React.FC = () => {
     let targetY = -100;
     let currentX = -100;
     let currentY = -100;
-    let animationFrameId: number;
+    let animationFrameId: number = 0;
+    let visible = false;
+    let currentState: 'default' | 'button' | 'link' | 'card' = 'default';
 
     const onMouseMove = (e: MouseEvent) => {
       targetX = e.clientX;
       targetY = e.clientY;
-      setPosition({ x: e.clientX, y: e.clientY });
-      if (!isVisible) setIsVisible(true);
+
+      if (!visible) {
+        visible = true;
+        setIsVisible(true);
+      }
+
+      // Direct DOM transform for zero-latency sharp central dot (NO React re-render)
+      if (dotRef.current) {
+        dotRef.current.style.transform = `translate3d(${targetX}px, ${targetY}px, 0)`;
+      }
 
       // Determine interactive target
       const target = e.target as HTMLElement | null;
       if (!target) return;
 
-      const button = target.closest('button, [role="button"], input[type="submit"]');
-      const link = target.closest('a');
-      const card = target.closest('.glass-panel, .tech-card, [data-interactive-card="true"]');
+      let newState: 'default' | 'button' | 'link' | 'card' = 'default';
+      if (target.closest('button, [role="button"], input[type="submit"]')) {
+        newState = 'button';
+      } else if (target.closest('a')) {
+        newState = 'link';
+      } else if (target.closest('.glass-panel, .tech-card, [data-interactive-card="true"]')) {
+        newState = 'card';
+      }
 
-      if (button) {
-        setCursorState('button');
-      } else if (link) {
-        setCursorState('link');
-      } else if (card) {
-        setCursorState('card');
-      } else {
-        setCursorState('default');
+      if (newState !== currentState) {
+        currentState = newState;
+        setCursorState(newState);
       }
     };
 
     const onMouseLeave = () => {
+      visible = false;
       setIsVisible(false);
     };
 
     const onMouseEnter = () => {
+      visible = true;
       setIsVisible(true);
     };
 
-    // Smooth trailing ring lerp loop
+    // Smooth trailing ring lerp loop using direct DOM transform
     const render = () => {
-      currentX += (targetX - currentX) * 0.18;
-      currentY += (targetY - currentY) * 0.18;
-      setTrailPos({ x: currentX, y: currentY });
+      currentX += (targetX - currentX) * 0.22;
+      currentY += (targetY - currentY) * 0.22;
+
+      if (ringRef.current) {
+        ringRef.current.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
+      }
+
       animationFrameId = requestAnimationFrame(render);
     };
 
@@ -76,15 +93,14 @@ export const CustomCursor: React.FC = () => {
       window.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseleave', onMouseLeave);
       document.removeEventListener('mouseenter', onMouseEnter);
-      cancelAnimationFrame(animationFrameId);
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
     };
-  }, [isVisible]);
+  }, [prefersReducedMotion]);
 
   if (isTouchDevice || prefersReducedMotion || !isVisible) {
     return null;
   }
 
-  // Sizing and styling based on hover state
   const isExpanded = cursorState === 'button' || cursorState === 'link';
   const isCard = cursorState === 'card';
 
@@ -92,29 +108,29 @@ export const CustomCursor: React.FC = () => {
     <div className="pointer-events-none fixed inset-0 z-50 overflow-hidden" aria-hidden="true">
       {/* Central Sharp Dot */}
       <div
-        className="fixed w-2 h-2 rounded-full bg-cyan-400 -translate-x-1/2 -translate-y-1/2 transition-transform duration-75 ease-out shadow-xs shadow-cyan-400/80"
+        ref={dotRef}
+        className="fixed top-0 left-0 -ml-1 -mt-1 w-2 h-2 rounded-full bg-cyan-400 will-change-transform shadow-xs shadow-cyan-400/80 transition-opacity duration-150"
         style={{
-          left: `${position.x}px`,
-          top: `${position.y}px`,
-          transform: `translate(-50%, -50%) scale(${isExpanded ? 0 : 1})`,
+          opacity: isExpanded ? 0 : 1,
         }}
       />
 
-      {/* Trailing Fluid Luminous Ring */}
+      {/* Trailing Outer Futuristic Targeting Ring */}
       <div
-        className={`fixed rounded-full -translate-x-1/2 -translate-y-1/2 border transition-all duration-200 ease-out ${
+        ref={ringRef}
+        className={`fixed top-0 left-0 -ml-5 -mt-5 rounded-full border will-change-transform transition-all duration-150 flex items-center justify-center ${
           isExpanded
-            ? 'w-12 h-12 border-cyan-400 bg-cyan-400/15 backdrop-blur-[1px] shadow-lg shadow-cyan-500/25 scale-100'
+            ? 'w-12 h-12 -ml-6 -mt-6 border-cyan-400/80 bg-cyan-500/15 shadow-lg shadow-cyan-500/30'
             : isCard
-            ? 'w-10 h-10 border-cyan-400/50 bg-cyan-500/5'
-            : 'w-7 h-7 border-cyan-500/40 bg-transparent'
+            ? 'w-10 h-10 -ml-5 -mt-5 border-blue-400/60 bg-blue-500/10'
+            : 'w-8 h-8 -ml-4 -mt-4 border-cyan-400/40 bg-transparent'
         }`}
-        style={{
-          left: `${trailPos.x}px`,
-          top: `${trailPos.y}px`,
-          transform: 'translate(-50%, -50%)',
-        }}
-      />
+      >
+        {/* Subtle center reticle crosshair marks for cyber aesthetic */}
+        {isExpanded && (
+          <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
+        )}
+      </div>
     </div>
   );
 };

@@ -18,18 +18,27 @@ import { WhatsAppButton } from './components/WhatsAppButton';
 import { CustomCursor } from './components/CustomCursor';
 import { BackgroundSystem } from './components/BackgroundSystem';
 import { IntroAnimation } from './components/IntroAnimation';
+import { InquiryType } from './services/leadSubmissionService';
 
 export default function App() {
   const [introFinished, setIntroFinished] = useState(false);
   const [prefilledProjectType, setPrefilledProjectType] = useState<string>('Websites');
   const [prefilledMessage, setPrefilledMessage] = useState<string>('');
+  const [prefilledIntent, setPrefilledIntent] = useState<InquiryType>('Start Your Project');
 
-  const scrollToContact = (projectType?: string, messageNote?: string) => {
+  const scrollToContact = (
+    projectType?: string,
+    messageNote?: string,
+    intent?: InquiryType
+  ) => {
     if (projectType) {
       setPrefilledProjectType(projectType);
     }
     if (messageNote) {
       setPrefilledMessage(messageNote);
+    }
+    if (intent) {
+      setPrefilledIntent(intent);
     }
     const contactElement = document.getElementById('contact');
     if (contactElement) {
@@ -73,21 +82,33 @@ export default function App() {
 
       {/* Floating Glassmorphic Sticky Navigation */}
       <Navbar
-        onOpenContact={() => scrollToContact()}
-        onGetQuote={() => scrollToContact('Business Software', 'I would like to request an official scope estimate and technical proposal for our project.')}
+        onOpenContact={() => scrollToContact(undefined, undefined, 'Contact Us')}
+        onGetQuote={() =>
+          scrollToContact(
+            'Business Software',
+            'I would like to request an official scope estimate and technical proposal for our project.',
+            'Get A Quote'
+          )
+        }
       />
 
       {/* Main Content Progression */}
       <main className="relative z-10">
         {/* 1. Cinematic 3D Hero Section */}
         <HeroSection
-          onStartProject={() => scrollToContact()}
+          onStartProject={() => scrollToContact(undefined, undefined, 'Start Your Project')}
           onExploreSolutions={scrollToSolutions}
         />
 
         {/* 2. "The Future of Business is Digital" Strategic Vision */}
         <FutureBusinessSection
-          onStartProject={() => scrollToContact('Business Software', 'We are interested in modernizing our business operations with your digital systems.')}
+          onStartProject={() =>
+            scrollToContact(
+              'Business Software',
+              'We are interested in modernizing our business operations with your digital systems.',
+              'Start Your Project'
+            )
+          }
         />
 
         {/* 3. Futuristic Services Section ("What We Build") */}
@@ -111,14 +132,21 @@ export default function App() {
 
             scrollToContact(
               mappedType,
-              `I would like to discuss engineering requirements for: ${serviceTitle}. Please provide architecture recommendations and a preliminary estimate.`
+              `I would like to discuss engineering requirements for: ${serviceTitle}. Please provide architecture recommendations and a preliminary estimate.`,
+              'Get A Quote'
             );
           }}
         />
 
         {/* 4. AI & Next-Gen Systems: "ENGINEERED FOR WHAT'S NEXT" */}
         <AITechnologySection
-          onStartProject={() => scrollToContact('AI Solutions', 'I would like to discuss deploying intelligent AI workflows and cloud systems for our operations.')}
+          onStartProject={() =>
+            scrollToContact(
+              'AI Solutions',
+              'I would like to discuss deploying intelligent AI workflows and cloud systems for our operations.',
+              'Start Your Project'
+            )
+          }
         />
 
         {/* 5. Turnkey Business Solutions & ERP Platforms */}
@@ -126,7 +154,8 @@ export default function App() {
           onSelectSolutionForEnquiry={(solutionName) => {
             scrollToContact(
               'Business Software',
-              `I would like to inquire about implementing your ${solutionName} for our organization.`
+              `I would like to inquire about implementing your ${solutionName} for our organization.`,
+              'Get A Quote'
             );
           }}
         />
@@ -142,7 +171,8 @@ export default function App() {
           onContactAboutSimilar={(projectTitle) => {
             scrollToContact(
               'Custom Software',
-              `I would like to discuss building a project similar to: ${projectTitle}.`
+              `I would like to discuss building a project similar to: ${projectTitle}.`,
+              'Start Your Project'
             );
           }}
           onViewAllProjects={() => {
@@ -158,15 +188,16 @@ export default function App() {
         <WhyUsSection />
 
         {/* 11. Engineering Identity & Live Runtime Architecture */}
-        <AboutSection onTalkWithUs={() => scrollToContact()} />
+        <AboutSection onTalkWithUs={() => scrollToContact(undefined, undefined, 'Contact Us')} />
 
         {/* 12. Large Futuristic CTA Section */}
-        <CTASection onStartProject={() => scrollToContact()} />
+        <CTASection onStartProject={() => scrollToContact(undefined, undefined, 'Start Your Project')} />
 
         {/* 13. Project Consultation & Contact Section */}
         <ContactSection
           prefilledProjectType={prefilledProjectType}
           prefilledMessage={prefilledMessage}
+          initialIntent={prefilledIntent}
         />
       </main>
 

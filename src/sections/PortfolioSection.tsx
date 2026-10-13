@@ -73,6 +73,10 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({
                 <img
                   src={project.imageUrl}
                   alt={project.title}
+                  loading="lazy"
+                  decoding="async"
+                  width={600}
+                  height={350}
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                 />

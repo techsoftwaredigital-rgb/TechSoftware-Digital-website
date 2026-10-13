@@ -1,32 +1,49 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useMotionPreference } from '../context/MotionPreferenceContext';
 
 export const BackgroundSystem: React.FC = () => {
   const { prefersReducedMotion } = useMotionPreference();
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const progressBarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Scroll progress handler
+    // 1. Direct Transform Scroll Progress without React re-renders
+    let scrollRafId: number = 0;
     const handleScroll = () => {
-      const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
-      if (totalScroll > 0) {
-        const currentProgress = (window.scrollY / totalScroll) * 100;
-        setScrollProgress(currentProgress);
-      }
+      if (scrollRafId) return;
+      scrollRafId = requestAnimationFrame(() => {
+        scrollRafId = 0;
+        if (!progressBarRef.current) return;
+        const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
+        if (totalScroll > 0) {
+          const ratio = Math.min(1, Math.max(0, window.scrollY / totalScroll));
+          progressBarRef.current.style.transform = `scaleX(${ratio})`;
+        }
+      });
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
 
-    // Particle canvas background
+    // 2. High-Efficiency Ambient Particle Canvas
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) {
+      return () => {
+        window.removeEventListener('scroll', handleScroll);
+        if (scrollRafId) cancelAnimationFrame(scrollRafId);
+      };
+    }
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    const ctx = canvas.getContext('2d', { alpha: true });
+    if (!ctx) {
+      return () => {
+        window.removeEventListener('scroll', handleScroll);
+        if (scrollRafId) cancelAnimationFrame(scrollRafId);
+      };
+    }
 
     const isMobile = window.innerWidth < 768;
-    const particleCount = isMobile ? 30 : 65;
+    const particleCount = isMobile ? 18 : 34;
 
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
@@ -44,33 +61,43 @@ export const BackgroundSystem: React.FC = () => {
       particles.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.35,
-        vy: (Math.random() - 0.5) * 0.35,
-        size: Math.random() * 1.6 + 0.6,
-        alpha: Math.random() * 0.45 + 0.1,
+        vx: (Math.random() - 0.5) * 0.25,
+        vy: (Math.random() - 0.5) * 0.25,
+        size: Math.random() * 1.4 + 0.6,
+        alpha: Math.random() * 0.4 + 0.1,
       });
     }
 
-    let animationId: number;
+    let animationId: number = 0;
+    let isDocVisible = !document.hidden;
+    const maxDist = isMobile ? 75 : 110;
+    const maxDistSq = maxDist * maxDist;
 
     const render = () => {
+      if (!isDocVisible) {
+        animationId = 0;
+        return;
+      }
+
       ctx.clearRect(0, 0, width, height);
 
-      // Draw subtle connecting digital lines between close particles
+      // Draw subtle connecting digital lines with squared-distance filter
       for (let i = 0; i < particles.length; i++) {
+        const p1 = particles[i];
         for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+          const p2 = particles[j];
+          const dx = p1.x - p2.x;
+          const dy = p1.y - p2.y;
+          const distSq = dx * dx + dy * dy;
 
-          const maxDist = isMobile ? 90 : 130;
-          if (dist < maxDist) {
-            const lineAlpha = (1 - dist / maxDist) * 0.08;
+          if (distSq < maxDistSq) {
+            const dist = Math.sqrt(distSq);
+            const lineAlpha = (1 - dist / maxDist) * 0.07;
             ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
             ctx.strokeStyle = `rgba(6, 182, 212, ${lineAlpha})`;
-            ctx.lineWidth = 0.75;
+            ctx.lineWidth = 0.7;
             ctx.stroke();
           }
         }
@@ -83,9 +110,9 @@ export const BackgroundSystem: React.FC = () => {
         p.y += p.vy;
 
         if (p.x < 0) p.x = width;
-        if (p.x > width) p.x = 0;
+        else if (p.x > width) p.x = 0;
         if (p.y < 0) p.y = height;
-        if (p.y > height) p.y = 0;
+        else if (p.y > height) p.y = 0;
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
@@ -104,24 +131,44 @@ export const BackgroundSystem: React.FC = () => {
       if (!canvas) return;
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
+      if (prefersReducedMotion) {
+        render();
+      }
     };
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', handleResize, { passive: true });
+
+    const handleVisibility = () => {
+      isDocVisible = !document.hidden;
+      if (isDocVisible && !animationId && !prefersReducedMotion) {
+        render();
+      } else if (!isDocVisible && animationId) {
+        cancelAnimationFrame(animationId);
+        animationId = 0;
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
 
     return () => {
-      cancelAnimationFrame(animationId);
+      if (animationId) cancelAnimationFrame(animationId);
+      if (scrollRafId) cancelAnimationFrame(scrollRafId);
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleResize);
+      document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, [prefersReducedMotion]);
 
   return (
     <div className="fixed inset-0 pointer-events-none select-none z-0 overflow-hidden" aria-hidden="true">
-      {/* Top illuminated scroll progress line */}
-      <div className="fixed top-0 left-0 right-0 h-[2px] z-50 bg-slate-900/60">
+      {/* Top illuminated scroll progress line with GPU-accelerated transform */}
+      <div className="fixed top-0 left-0 right-0 h-[2px] z-50 bg-slate-900/60 pointer-events-none">
         <div
-          className="h-full bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-500 shadow-sm shadow-cyan-400/80 transition-all duration-75"
-          style={{ width: `${scrollProgress}%` }}
+          ref={progressBarRef}
+          className="h-full bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-500 shadow-sm shadow-cyan-400/80 will-change-transform"
+          style={{
+            transform: 'scaleX(0)',
+            transformOrigin: 'left center',
+          }}
         />
       </div>
 
@@ -134,10 +181,10 @@ export const BackgroundSystem: React.FC = () => {
       {/* Layer 3: Floating Interactive Ambient Particles & Constellation Lines Canvas */}
       <canvas ref={canvasRef} className="absolute inset-0 opacity-80" />
 
-      {/* Layer 4: Soft Diffused Luminous Radial Blobs */}
-      <div className="absolute -top-40 left-1/4 w-[600px] h-[600px] bg-cyan-950/15 rounded-full blur-[120px]" />
-      <div className="absolute top-1/2 -right-40 w-[550px] h-[550px] bg-indigo-950/15 rounded-full blur-[140px]" />
-      <div className="absolute -bottom-40 left-1/3 w-[650px] h-[650px] bg-blue-950/15 rounded-full blur-[130px]" />
+      {/* Layer 4: Soft Diffused Luminous Radial Blobs (Optimized GPU rendering) */}
+      <div className="absolute -top-40 left-1/4 w-[500px] h-[500px] bg-cyan-950/15 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-1/2 -right-40 w-[450px] h-[450px] bg-indigo-950/15 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute -bottom-40 left-1/3 w-[550px] h-[550px] bg-blue-950/15 rounded-full blur-[110px] pointer-events-none" />
 
       {/* Layer 5: Soft Vignette border for cinematic depth */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_45%,#030712_95%)] opacity-85" />
