@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, ArrowUpRight, Phone, Sparkles } from 'lucide-react';
+import { Menu, X, ArrowUpRight, Phone, Sparkles, Download } from 'lucide-react';
+import { usePWA } from '../context/PWAContext';
 
 interface NavbarProps {
   onOpenContact?: () => void;
@@ -7,6 +8,7 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenContact, onGetQuote }) => {
+  const { isInstalled, openInstallFlow } = usePWA();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
@@ -134,6 +136,19 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContact, onGetQuote }) => 
               <span>8169401877</span>
             </a>
 
+            {/* Optional Install Web App button */}
+            {!isInstalled && (
+              <button
+                onClick={openInstallFlow}
+                type="button"
+                className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono rounded-lg border border-cyan-500/30 text-cyan-300 hover:text-white hover:bg-cyan-950/40 hover:border-cyan-400 transition-all cursor-pointer"
+                title="Install Progressive Web App"
+              >
+                <Download className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Install App</span>
+              </button>
+            )}
+
             {/* GET A QUOTE Button with micro-interactions */}
             <button
               onClick={handleQuoteClick}
@@ -188,6 +203,20 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContact, onGetQuote }) => 
               <Phone className="w-3.5 h-3.5 text-cyan-400" />
               <span>Direct Line: 8169401877</span>
             </a>
+
+            {!isInstalled && (
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  openInstallFlow();
+                }}
+                className="w-full py-2 px-3 text-xs font-mono text-cyan-300 bg-cyan-950/40 hover:bg-cyan-900/50 rounded-lg border border-cyan-500/40 flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Install Web App</span>
+              </button>
+            )}
 
             <button
               onClick={handleQuoteClick}

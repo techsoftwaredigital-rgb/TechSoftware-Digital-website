@@ -19,6 +19,10 @@ import { CustomCursor } from './components/CustomCursor';
 import { BackgroundSystem } from './components/BackgroundSystem';
 import { IntroAnimation } from './components/IntroAnimation';
 import { InquiryType } from './services/leadSubmissionService';
+import { PWAProvider } from './context/PWAContext';
+import { PWAInstallModal } from './components/PWAInstallModal';
+import { PWAFloatingButton } from './components/PWAFloatingButton';
+import { PWAInstallGuideModal } from './components/PWAInstallGuideModal';
 
 export default function App() {
   const [introFinished, setIntroFinished] = useState(false);
@@ -60,152 +64,156 @@ export default function App() {
     }
   };
 
-  const scrollToWork = () => {
-    const workElem = document.getElementById('portfolio');
-    if (workElem) {
-      workElem.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-[#030712] text-slate-100 relative selection:bg-cyan-500/25 selection:text-cyan-300">
-      {/* Website Entrance Cinematic Intro Animation (First-load only, <2s) */}
-      {!introFinished && (
-        <IntroAnimation onComplete={() => setIntroFinished(true)} />
-      )}
+    <PWAProvider>
+      <div className="min-h-screen bg-[#030712] text-slate-100 relative selection:bg-cyan-500/25 selection:text-cyan-300">
+        {/* Website Entrance Cinematic Intro Animation (First-load only, <2s) */}
+        {!introFinished && (
+          <IntroAnimation onComplete={() => setIntroFinished(true)} />
+        )}
 
-      {/* Futuristic Desktop Custom Cursor System (Disabled on touch & reduced-motion) */}
-      <CustomCursor />
+        {/* Futuristic Desktop Custom Cursor System (Disabled on touch & reduced-motion) */}
+        <CustomCursor />
 
-      {/* Multi-layered Intelligent Background System (Grid, floating particles, radial glow) */}
-      <BackgroundSystem />
+        {/* Multi-layered Intelligent Background System (Grid, floating particles, radial glow) */}
+        <BackgroundSystem />
 
-      {/* Floating Glassmorphic Sticky Navigation */}
-      <Navbar
-        onOpenContact={() => scrollToContact(undefined, undefined, 'Contact Us')}
-        onGetQuote={() =>
-          scrollToContact(
-            'Business Software',
-            'I would like to request an official scope estimate and technical proposal for our project.',
-            'Get A Quote'
-          )
-        }
-      />
-
-      {/* Main Content Progression */}
-      <main className="relative z-10">
-        {/* 1. Cinematic 3D Hero Section */}
-        <HeroSection
-          onStartProject={() => scrollToContact(undefined, undefined, 'Start Your Project')}
-          onExploreSolutions={scrollToSolutions}
-        />
-
-        {/* 2. "The Future of Business is Digital" Strategic Vision */}
-        <FutureBusinessSection
-          onStartProject={() =>
+        {/* Floating Glassmorphic Sticky Navigation */}
+        <Navbar
+          onOpenContact={() => scrollToContact(undefined, undefined, 'Contact Us')}
+          onGetQuote={() =>
             scrollToContact(
               'Business Software',
-              'We are interested in modernizing our business operations with your digital systems.',
-              'Start Your Project'
+              'I would like to request an official scope estimate and technical proposal for our project.',
+              'Get A Quote'
             )
           }
         />
 
-        {/* 3. Futuristic Services Section ("What We Build") */}
-        <ServicesSection
-          onSelectServiceForEnquiry={(serviceTitle) => {
-            const mappedType = serviceTitle.includes('ANDROID')
-              ? 'Android Apps'
-              : serviceTitle.includes('iOS')
-              ? 'iOS Apps'
-              : serviceTitle.includes('WEB APPLICATIONS')
-              ? 'Web Applications'
-              : serviceTitle.includes('BUSINESS SOFTWARE')
-              ? 'Business Software'
-              : serviceTitle.includes('AI')
-              ? 'AI Solutions'
-              : serviceTitle.includes('SAAS')
-              ? 'SaaS Platforms'
-              : serviceTitle.includes('CUSTOM')
-              ? 'Custom Software'
-              : 'Websites';
+        {/* Main Content Progression */}
+        <main className="relative z-10">
+          {/* 1. Cinematic 3D Hero Section */}
+          <HeroSection
+            onStartProject={() => scrollToContact(undefined, undefined, 'Start Your Project')}
+            onExploreSolutions={scrollToSolutions}
+          />
 
-            scrollToContact(
-              mappedType,
-              `I would like to discuss engineering requirements for: ${serviceTitle}. Please provide architecture recommendations and a preliminary estimate.`,
-              'Get A Quote'
-            );
-          }}
-        />
+          {/* 2. "The Future of Business is Digital" Strategic Vision */}
+          <FutureBusinessSection
+            onStartProject={() =>
+              scrollToContact(
+                'Business Software',
+                'We are interested in modernizing our business operations with your digital systems.',
+                'Start Your Project'
+              )
+            }
+          />
 
-        {/* 4. AI & Next-Gen Systems: "ENGINEERED FOR WHAT'S NEXT" */}
-        <AITechnologySection
-          onStartProject={() =>
-            scrollToContact(
-              'AI Solutions',
-              'I would like to discuss deploying intelligent AI workflows and cloud systems for our operations.',
-              'Start Your Project'
-            )
-          }
-        />
+          {/* 3. Futuristic Services Section ("What We Build") */}
+          <ServicesSection
+            onSelectServiceForEnquiry={(serviceTitle) => {
+              const mappedType = serviceTitle.includes('ANDROID')
+                ? 'Android Apps'
+                : serviceTitle.includes('iOS')
+                ? 'iOS Apps'
+                : serviceTitle.includes('WEB APPLICATIONS')
+                ? 'Web Applications'
+                : serviceTitle.includes('BUSINESS SOFTWARE')
+                ? 'Business Software'
+                : serviceTitle.includes('AI')
+                ? 'AI Solutions'
+                : serviceTitle.includes('SAAS')
+                ? 'SaaS Platforms'
+                : serviceTitle.includes('CUSTOM')
+                ? 'Custom Software'
+                : 'Websites';
 
-        {/* 5. Turnkey Business Solutions & ERP Platforms */}
-        <SolutionsSection
-          onSelectSolutionForEnquiry={(solutionName) => {
-            scrollToContact(
-              'Business Software',
-              `I would like to inquire about implementing your ${solutionName} for our organization.`,
-              'Get A Quote'
-            );
-          }}
-        />
+              scrollToContact(
+                mappedType,
+                `I would like to discuss engineering requirements for: ${serviceTitle}. Please provide architecture recommendations and a preliminary estimate.`,
+                'Get A Quote'
+              );
+            }}
+          />
 
-        {/* 6. Interactive Technology Ecosystem */}
-        <TechSection />
+          {/* 4. AI & Next-Gen Systems: "ENGINEERED FOR WHAT'S NEXT" */}
+          <AITechnologySection
+            onStartProject={() =>
+              scrollToContact(
+                'AI Solutions',
+                'I would like to discuss deploying intelligent AI workflows and cloud systems for our operations.',
+                'Start Your Project'
+              )
+            }
+          />
 
-        {/* 7. Company Capability Statistics */}
-        <StatsSection />
+          {/* 5. Turnkey Business Solutions & ERP Platforms */}
+          <SolutionsSection
+            onSelectSolutionForEnquiry={(solutionName) => {
+              scrollToContact(
+                'Business Software',
+                `I would like to inquire about implementing your ${solutionName} for our organization.`,
+                'Get A Quote'
+              );
+            }}
+          />
 
-        {/* 8. Selected Projects & Work Portfolio */}
-        <PortfolioSection
-          onContactAboutSimilar={(projectTitle) => {
-            scrollToContact(
-              'Custom Software',
-              `I would like to discuss building a project similar to: ${projectTitle}.`,
-              'Start Your Project'
-            );
-          }}
-          onViewAllProjects={() => {
-            const elem = document.getElementById('portfolio');
-            if (elem) elem.scrollIntoView({ behavior: 'smooth' });
-          }}
-        />
+          {/* 6. Interactive Technology Ecosystem */}
+          <TechSection />
 
-        {/* 9. Interactive Development Process Timeline (01-07) */}
-        <ProcessSection />
+          {/* 7. Company Capability Statistics */}
+          <StatsSection />
 
-        {/* 10. Why Businesses Choose TechSoftware.digital */}
-        <WhyUsSection />
+          {/* 8. Selected Projects & Work Portfolio */}
+          <PortfolioSection
+            onContactAboutSimilar={(projectTitle) => {
+              scrollToContact(
+                'Custom Software',
+                `I would like to discuss building a project similar to: ${projectTitle}.`,
+                'Start Your Project'
+              );
+            }}
+            onViewAllProjects={() => {
+              const elem = document.getElementById('portfolio');
+              if (elem) elem.scrollIntoView({ behavior: 'smooth' });
+            }}
+          />
 
-        {/* 11. Engineering Identity & Live Runtime Architecture */}
-        <AboutSection onTalkWithUs={() => scrollToContact(undefined, undefined, 'Contact Us')} />
+          {/* 9. Interactive Development Process Timeline (01-07) */}
+          <ProcessSection />
 
-        {/* 12. Large Futuristic CTA Section */}
-        <CTASection onStartProject={() => scrollToContact(undefined, undefined, 'Start Your Project')} />
+          {/* 10. Why Businesses Choose TechSoftware.digital */}
+          <WhyUsSection />
 
-        {/* 13. Project Consultation & Contact Section */}
-        <ContactSection
-          prefilledProjectType={prefilledProjectType}
-          prefilledMessage={prefilledMessage}
-          initialIntent={prefilledIntent}
-        />
-      </main>
+          {/* 11. Engineering Identity & Live Runtime Architecture */}
+          <AboutSection onTalkWithUs={() => scrollToContact(undefined, undefined, 'Contact Us')} />
 
-      {/* Premium Minimal Footer */}
-      <Footer />
+          {/* 12. Large Futuristic CTA Section */}
+          <CTASection onStartProject={() => scrollToContact(undefined, undefined, 'Start Your Project')} />
 
-      {/* Floating WhatsApp Action Button */}
-      <WhatsAppButton />
-    </div>
+          {/* 13. Project Consultation & Contact Section */}
+          <ContactSection
+            prefilledProjectType={prefilledProjectType}
+            prefilledMessage={prefilledMessage}
+            initialIntent={prefilledIntent}
+          />
+        </main>
+
+        {/* Premium Minimal Footer */}
+        <Footer />
+
+        {/* Floating WhatsApp Action Button */}
+        <WhatsAppButton />
+
+        {/* PWA Floating Install Icon on Right Edge */}
+        <PWAFloatingButton />
+
+        {/* PWA Guided Install Modal for iOS / Safari / Desktop */}
+        <PWAInstallGuideModal />
+
+        {/* PWA Automatic & Interactive Install Popup */}
+        <PWAInstallModal />
+      </div>
+    </PWAProvider>
   );
 }
