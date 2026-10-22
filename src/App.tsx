@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { HeroSection } from './sections/HeroSection';
 import { FutureBusinessSection } from './sections/FutureBusinessSection';
@@ -30,6 +30,20 @@ export default function App() {
   const [prefilledMessage, setPrefilledMessage] = useState<string>('');
   const [prefilledIntent, setPrefilledIntent] = useState<InquiryType>('Start Your Project');
 
+  // Handle URL redirect if someone lands on /demo-projects: smoothly send to #work
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const path = window.location.pathname;
+    const hash = window.location.hash;
+    if (path === '/demo-projects' || path.startsWith('/demo-projects/') || hash === '#demo-projects') {
+      window.history.replaceState({}, '', '/#work');
+      setTimeout(() => {
+        const elem = document.getElementById('work') || document.getElementById('portfolio');
+        if (elem) elem.scrollIntoView({ behavior: 'smooth' });
+      }, 250);
+    }
+  }, []);
+
   const scrollToContact = (
     projectType?: string,
     messageNote?: string,
@@ -50,17 +64,17 @@ export default function App() {
     }
   };
 
+  const scrollToWork = () => {
+    const workElem = document.getElementById('work') || document.getElementById('portfolio');
+    if (workElem) {
+      workElem.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const scrollToSolutions = () => {
     const solutionsElem = document.getElementById('solutions');
     if (solutionsElem) {
       solutionsElem.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const scrollToServices = () => {
-    const servicesElem = document.getElementById('services');
-    if (servicesElem) {
-      servicesElem.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -90,11 +104,12 @@ export default function App() {
           }
         />
 
-        {/* Main Content Progression */}
+        {/* Main Single-Page Unified Experience */}
         <main className="relative z-10">
           {/* 1. Cinematic 3D Hero Section */}
           <HeroSection
             onStartProject={() => scrollToContact(undefined, undefined, 'Start Your Project')}
+            onExploreWork={scrollToWork}
             onExploreSolutions={scrollToSolutions}
           />
 
@@ -164,18 +179,14 @@ export default function App() {
           {/* 7. Company Capability Statistics */}
           <StatsSection />
 
-          {/* 8. Selected Projects & Work Portfolio */}
+          {/* 8. Selected Projects & Work (Featuring All 30 Demo Apps & Production Projects) */}
           <PortfolioSection
-            onContactAboutSimilar={(projectTitle) => {
+            onContactAboutSimilar={(projectName, projectCategory) => {
               scrollToContact(
-                'Custom Software',
-                `I would like to discuss building a project similar to: ${projectTitle}.`,
+                projectCategory || 'Business Software',
+                `I am interested in ordering or building a solution similar to demo project: "${projectName}". Please share a project quote, technical architecture, and implementation timeline.`,
                 'Start Your Project'
               );
-            }}
-            onViewAllProjects={() => {
-              const elem = document.getElementById('portfolio');
-              if (elem) elem.scrollIntoView({ behavior: 'smooth' });
             }}
           />
 

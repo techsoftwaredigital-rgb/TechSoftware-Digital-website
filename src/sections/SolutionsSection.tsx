@@ -146,7 +146,7 @@ export const SolutionsSection: React.FC<SolutionsSectionProps> = ({
               >
                 {/* Profile Image & Header Stage */}
                 <div className="relative h-44 w-full overflow-hidden bg-slate-950 border-b border-slate-800/80">
-                  {solution.imageUrl ? (
+                  {solution.imageUrl && solution.imageUrl.trim() !== '' ? (
                     <img
                       src={solution.imageUrl}
                       alt={solution.name}
@@ -156,6 +156,9 @@ export const SolutionsSection: React.FC<SolutionsSectionProps> = ({
                       height={280}
                       referrerPolicy="no-referrer"
                       className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                      onError={(e) => {
+                        (e.target as HTMLElement).style.display = 'none';
+                      }}
                     />
                   ) : (
                     <div className={`w-full h-full bg-gradient-to-br ${solution.gradient} flex items-center justify-center p-6`}>

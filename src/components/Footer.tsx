@@ -9,14 +9,23 @@ export const Footer: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const navLinks = [
+    { label: 'Home', href: '#home' },
+    { label: 'Services', href: '#services' },
+    { label: 'Solutions', href: '#solutions' },
+    { label: 'Technologies', href: '#technologies' },
+    { label: 'Work & Projects (30)', href: '#work' },
+    { label: 'Process', href: '#process' },
+    { label: 'About', href: '#about' },
+    { label: 'Contact', href: '#contact' },
+  ];
+
   return (
     <footer className="relative bg-[#02050c] border-t border-slate-800/80 pt-16 pb-12 text-slate-400 text-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
         {/* Main Footer Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-slate-800/60">
-          
-          {/* Brand Col */}
+          {/* Brand Column */}
           <div className="lg:col-span-2 space-y-4">
             <a href="#home" className="inline-flex items-center gap-2 group">
               <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-cyan-400 to-indigo-600 flex items-center justify-center p-0.5 shadow-md shadow-cyan-500/20">
@@ -28,7 +37,7 @@ export const Footer: React.FC = () => {
             </a>
 
             <p className="text-xs sm:text-sm text-slate-400 max-w-sm leading-relaxed">
-              Websites, Apps & Business Software Solutions. We design, architect, and deploy digital systems that empower modern enterprises.
+              Websites, Apps &amp; Business Software Solutions. We design, architect, and deploy digital systems that empower modern enterprises.
             </p>
 
             <div className="pt-2 space-y-2 text-xs font-mono">
@@ -59,32 +68,31 @@ export const Footer: React.FC = () => {
             </div>
           </div>
 
-          {/* Nav Links */}
+          {/* Navigation Links */}
           <div className="space-y-3">
             <h4 className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-200">
               Navigation
             </h4>
             <ul className="space-y-2">
-              {['Home', 'Services', 'Solutions', 'Technologies', 'Portfolio', 'Process', 'About', 'Contact'].map((item) => {
-                const targetId = item.toLowerCase() === 'portfolio' ? '#work' : `#${item.toLowerCase()}`;
-                return (
-                  <li key={item}>
-                    <a
-                      href={targetId}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        const elem = document.querySelector(targetId) || (targetId === '#work' ? document.querySelector('#portfolio') : null);
-                        if (elem) {
-                          elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        }
-                      }}
-                      className="hover:text-cyan-400 transition-colors cursor-pointer"
-                    >
-                      {item === 'Portfolio' ? 'Work (Portfolio)' : item}
-                    </a>
-                  </li>
-                );
-              })}
+              {navLinks.map((item) => (
+                <li key={item.label}>
+                  <a
+                    href={item.href}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const elem =
+                        document.querySelector(item.href) ||
+                        (item.href === '#work' ? document.querySelector('#portfolio') : null);
+                      if (elem) {
+                        elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }
+                    }}
+                    className="hover:text-cyan-400 transition-colors cursor-pointer"
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -149,7 +157,15 @@ export const Footer: React.FC = () => {
             <div className="flex items-center gap-2 text-xs font-mono text-slate-400 bg-slate-900/90 px-3 py-1.5 rounded-lg border border-slate-800">
               <span className="text-[10px] uppercase text-slate-500">Motion:</span>
               <button
-                onClick={() => setMotionMode(motionMode === 'reduced' ? 'full' : motionMode === 'full' ? 'system' : 'reduced')}
+                onClick={() =>
+                  setMotionMode(
+                    motionMode === 'reduced'
+                      ? 'full'
+                      : motionMode === 'full'
+                      ? 'system'
+                      : 'reduced'
+                  )
+                }
                 className="text-cyan-400 hover:text-cyan-300 transition-colors font-medium flex items-center gap-1.5 cursor-pointer"
                 title="Toggle Reduced Motion Accessibility Mode"
               >

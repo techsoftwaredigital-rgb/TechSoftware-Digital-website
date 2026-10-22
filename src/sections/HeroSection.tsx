@@ -1,14 +1,16 @@
 import React from 'react';
-import { ArrowRight, ChevronDown, Terminal, Shield, Sparkles } from 'lucide-react';
+import { ArrowRight, ChevronDown, Terminal, FolderGit2 } from 'lucide-react';
 import { Scene3D } from './Scene3D';
 
 interface HeroSectionProps {
   onStartProject: () => void;
+  onExploreWork: () => void;
   onExploreSolutions: () => void;
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
   onStartProject,
+  onExploreWork,
   onExploreSolutions,
 }) => {
   return (
@@ -21,7 +23,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
       {/* Hero Foreground Content with cinematic depth */}
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
-        
         {/* Subtle Futuristic Trust Node */}
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/80 border border-cyan-500/30 text-xs font-mono text-cyan-300 backdrop-blur-md shadow-lg shadow-cyan-950/40 mb-6">
           <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
@@ -40,32 +41,38 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
         {/* Subheading */}
         <p className="mt-6 text-base sm:text-xl md:text-2xl font-medium text-slate-200 tracking-tight max-w-3xl font-display leading-snug">
-          Websites, Apps, Business Software & AI Solutions engineered for the next generation.
+          Websites, Apps, Business Software &amp; AI Solutions engineered for the next generation.
         </p>
 
-        {/* Action Buttons with magnetic & light sweep styling */}
-        <div className="mt-9 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+        {/* Action Buttons */}
+        <div className="mt-9 flex flex-col sm:flex-row items-center justify-center gap-3.5 w-full sm:w-auto">
           <button
             onClick={onStartProject}
-            className="group relative overflow-hidden w-full sm:w-auto px-8 py-4 text-xs sm:text-sm font-semibold uppercase tracking-wider text-black bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-400 hover:from-cyan-300 hover:to-blue-300 rounded-xl shadow-xl shadow-cyan-500/25 hover:shadow-cyan-400/50 hover:scale-[1.03] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
+            className="group relative overflow-hidden w-full sm:w-auto px-7 py-3.5 text-xs sm:text-sm font-semibold uppercase tracking-wider text-black bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-400 hover:from-cyan-300 hover:to-blue-300 rounded-xl shadow-xl shadow-cyan-500/25 hover:shadow-cyan-400/50 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer font-sans"
           >
-            {/* Button light sweep effect */}
             <span className="absolute top-0 -left-[100%] w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:left-[100%] transition-all duration-700 pointer-events-none" />
-
             <span>START YOUR PROJECT</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>
 
           <button
-            onClick={onExploreSolutions}
-            className="w-full sm:w-auto px-7 py-4 text-xs sm:text-sm font-medium text-slate-200 hover:text-white bg-slate-900/80 hover:bg-slate-800/90 rounded-xl border border-slate-700/80 hover:border-cyan-500/50 backdrop-blur-md transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer group"
+            onClick={onExploreWork}
+            className="group relative overflow-hidden w-full sm:w-auto px-6 py-3.5 text-xs sm:text-sm font-semibold uppercase tracking-wider text-cyan-300 hover:text-white bg-cyan-950/40 hover:bg-cyan-900/60 rounded-xl border border-cyan-500/50 hover:border-cyan-400 shadow-lg shadow-cyan-950/40 backdrop-blur-md transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer font-sans"
           >
-            <span>EXPLORE OUR SOLUTIONS</span>
+            <FolderGit2 className="w-4 h-4 text-cyan-400" />
+            <span>EXPLORE OUR WORK (30 APPS)</span>
+          </button>
+
+          <button
+            onClick={onExploreSolutions}
+            className="w-full sm:w-auto px-6 py-3.5 text-xs sm:text-sm font-medium text-slate-200 hover:text-white bg-slate-900/80 hover:bg-slate-800/90 rounded-xl border border-slate-700/80 hover:border-cyan-500/50 backdrop-blur-md transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer group font-sans"
+          >
+            <span>OUR SOLUTIONS</span>
             <ChevronDown className="w-4 h-4 text-cyan-400 group-hover:translate-y-0.5 transition-transform" />
           </button>
         </div>
 
-        {/* Unboxed Metadata Discipline with typographic separators */}
+        {/* Typographic Metadata list */}
         <div className="mt-12 flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs sm:text-sm font-medium text-slate-400">
           <span className="text-slate-300">Web Platforms</span>
           <span className="text-cyan-500" aria-hidden="true">·</span>
