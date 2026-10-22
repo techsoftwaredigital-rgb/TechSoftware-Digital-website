@@ -76,6 +76,23 @@ export const DemoProjectDetailModal: React.FC<DemoProjectDetailModalProps> = ({
               <span className="px-2.5 py-0.5 rounded-md text-[11px] font-mono font-medium bg-slate-800 text-slate-300 border border-slate-700">
                 {project.platformBadge}
               </span>
+              <span className="px-2.5 py-0.5 rounded-md text-[11px] font-mono font-medium bg-cyan-950/80 text-cyan-300 border border-cyan-500/40">
+                {project.category}
+              </span>
+              {project.categories && project.categories.length > 1 && (
+                <div className="flex flex-wrap items-center gap-1">
+                  {project.categories
+                    .filter((c) => c !== project.category)
+                    .map((cat) => (
+                      <span
+                        key={cat}
+                        className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-800"
+                      >
+                        #{cat}
+                      </span>
+                    ))}
+                </div>
+              )}
               <span className="text-xs font-mono text-cyan-400">
                 {project.industry}
               </span>

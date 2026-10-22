@@ -11,9 +11,26 @@ import {
   Sparkles,
   ChevronDown,
   ChevronUp,
+  Layers,
+  Globe,
+  Building2,
+  Cloud,
+  Smartphone,
+  ShoppingBag,
+  Sliders,
 } from 'lucide-react';
-import { demoProjectsData, demoCategories, DemoProject } from '../data/demoProjects';
+import { demoProjectsData, demoCategories, DemoProject, DemoCategory } from '../data/demoProjects';
 import { DemoProjectDetailModal } from '../components/DemoProjectDetailModal';
+
+const categoryIconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+  'All Projects': Layers,
+  'Websites': Globe,
+  'Business Software': Building2,
+  'SaaS Platforms': Cloud,
+  'Mobile Apps': Smartphone,
+  'E-commerce': ShoppingBag,
+  'Industry Solutions': Sliders,
+};
 
 interface PortfolioSectionProps {
   onContactAboutSimilar: (projectName: string, projectCategory?: string) => void;
@@ -32,8 +49,13 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({
     const counts: Record<string, number> = {
       'All Projects': demoProjectsData.length,
     };
-    demoProjectsData.forEach((project) => {
-      counts[project.category] = (counts[project.category] || 0) + 1;
+    demoCategories.forEach((cat) => {
+      if (cat.id === 'All Projects') return;
+      counts[cat.id] = demoProjectsData.filter(
+        (p) =>
+          p.category === cat.id ||
+          (p.categories && p.categories.includes(cat.id as DemoCategory))
+      ).length;
     });
     return counts;
   }, []);
@@ -43,7 +65,9 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({
     const query = searchQuery.trim().toLowerCase();
     return demoProjectsData.filter((project) => {
       const matchesCategory =
-        activeCategory === 'All Projects' || project.category === activeCategory;
+        activeCategory === 'All Projects' ||
+        project.category === activeCategory ||
+        (project.categories && project.categories.includes(activeCategory as DemoCategory));
 
       if (!matchesCategory) return false;
 
@@ -113,30 +137,33 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({
           )}
         </div>
 
-        {/* Category Filter Pills */}
-        <div className="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+        {/* Category Filter Pills (Fully Visible, Responsive, No Clipping) */}
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 pt-1 pb-1">
           {demoCategories.map((cat) => {
             const isActive = activeCategory === cat.id;
             const count = categoryCounts[cat.id] ?? 0;
+            const IconComp = categoryIconMap[cat.id] || Layers;
             return (
               <button
                 key={cat.id}
+                type="button"
                 onClick={() => {
                   setActiveCategory(cat.id);
                   setShowAll(false);
                 }}
-                className={`px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-xl transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                className={`px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-xl transition-all cursor-pointer flex items-center gap-2 ${
                   isActive
-                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/60 shadow-md shadow-cyan-950/60 font-semibold'
-                    : 'text-slate-400 hover:text-white bg-slate-900/60 border border-slate-800 hover:bg-slate-800/80'
+                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/70 shadow-lg shadow-cyan-950/60 font-semibold ring-1 ring-cyan-500/30 scale-[1.02]'
+                    : 'text-slate-300 hover:text-white bg-slate-900/80 border border-slate-800 hover:border-slate-700 hover:bg-slate-800/90'
                 }`}
               >
-                <span>{cat.label}</span>
+                <IconComp className={`w-3.5 h-3.5 ${isActive ? 'text-cyan-400' : 'text-slate-400'}`} />
+                <span className="tracking-wide">{cat.label}</span>
                 <span
-                  className={`text-[10px] font-mono px-1.5 py-0.2 rounded ${
+                  className={`text-[10px] font-mono px-1.5 py-0.5 rounded-md ${
                     isActive
-                      ? 'bg-cyan-400/30 text-cyan-200'
-                      : 'bg-slate-800 text-slate-400'
+                      ? 'bg-cyan-400/30 text-cyan-200 border border-cyan-400/40'
+                      : 'bg-slate-800 text-slate-400 border border-slate-700/60'
                   }`}
                 >
                   {count}
@@ -218,10 +245,19 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
 
                 {/* Badges on Image */}
-                <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10">
-                  <span className="text-[10px] font-mono font-medium text-cyan-200 bg-slate-950/90 border border-cyan-500/40 px-2 py-0.5 rounded backdrop-blur-md shadow-sm">
+                <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10 max-w-[70%]">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveCategory(project.category);
+                      setShowAll(false);
+                    }}
+                    title={`Filter by ${project.category}`}
+                    className="text-[10px] font-mono font-medium text-cyan-200 bg-slate-950/90 border border-cyan-500/40 hover:border-cyan-400 px-2 py-0.5 rounded backdrop-blur-md shadow-sm transition-colors cursor-pointer"
+                  >
                     {project.category}
-                  </span>
+                  </button>
                   <span className="text-[10px] font-mono text-slate-300 bg-slate-900/90 border border-slate-700/80 px-2 py-0.5 rounded backdrop-blur-md">
                     {project.platformBadge}
                   </span>
@@ -272,8 +308,35 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({
                     {project.name}
                   </h3>
 
+                  {/* Category Tags */}
+                  {project.categories && project.categories.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-1.5 mb-2">
+                      {project.categories.map((cat) => {
+                        const isMatchingActive = activeCategory === cat;
+                        return (
+                          <button
+                            key={cat}
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveCategory(cat);
+                              setShowAll(false);
+                            }}
+                            className={`text-[9px] font-mono px-1.5 py-0.5 rounded transition-all cursor-pointer ${
+                              isMatchingActive
+                                ? 'bg-cyan-500/25 text-cyan-300 border border-cyan-400/60'
+                                : 'bg-slate-800/80 text-slate-400 border border-slate-700/50 hover:text-cyan-300 hover:border-slate-600'
+                            }`}
+                          >
+                            #{cat}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+
                   {/* Description */}
-                  <p className="mt-2 text-xs text-slate-400 leading-relaxed line-clamp-2">
+                  <p className="mt-1 text-xs text-slate-400 leading-relaxed line-clamp-2">
                     {project.description}
                   </p>
 

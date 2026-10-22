@@ -10,6 +10,7 @@ export interface DemoProject {
   id: string;
   name: string;
   category: DemoCategory;
+  categories?: DemoCategory[];
   industry: string;
   description: string;
   features: [string, string, string] | string[];
@@ -41,6 +42,7 @@ export const demoProjectsData: DemoProject[] = [
     id: 'urban-bite',
     name: 'UrbanBite',
     category: 'Websites',
+    categories: ["Websites","E-commerce","Mobile Apps"],
     industry: 'Restaurant & Dining',
     description: 'High-conversion culinary website featuring digital QR menus, table reservation engine, and real-time kitchen dispatch notifications.',
     features: [
@@ -65,6 +67,7 @@ export const demoProjectsData: DemoProject[] = [
     id: 'prime-nest',
     name: 'PrimeNest',
     category: 'Websites',
+    categories: ["Websites","Industry Solutions"],
     industry: 'Real Estate & Properties',
     description: 'Luxury real estate marketplace featuring dynamic neighborhood maps, virtual 3D tour embeds, and an automated mortgage calculator.',
     features: [
@@ -89,6 +92,7 @@ export const demoProjectsData: DemoProject[] = [
     id: 'build-core',
     name: 'BuildCore',
     category: 'Websites',
+    categories: ["Websites","Industry Solutions"],
     industry: 'Construction & Civil Engineering',
     description: 'Heavy construction and civil infrastructure corporate portal showcasing landmark portfolios, safety compliance ratings, and RFP bid submissions.',
     features: [
@@ -113,6 +117,7 @@ export const demoProjectsData: DemoProject[] = [
     id: 'aura-salon',
     name: 'AuraSalon',
     category: 'Websites',
+    categories: ["Websites","Business Software"],
     industry: 'Beauty, Spa & Wellness',
     description: 'Chic boutique salon web experience with stylist portfolio lookbooks, package bundles, and seamless two-way calendar slot booking.',
     features: [
@@ -137,6 +142,7 @@ export const demoProjectsData: DemoProject[] = [
     id: 'drive-nova',
     name: 'DriveNova',
     category: 'Websites',
+    categories: ["Websites","Industry Solutions"],
     industry: 'Automotive Showroom & Dealerships',
     description: 'Next-gen automobile digital showroom featuring 360° vehicle exterior views, specs comparison matrix, and instant test drive reservation.',
     features: [
@@ -161,6 +167,7 @@ export const demoProjectsData: DemoProject[] = [
     id: 'edu-sphere',
     name: 'EduSphere',
     category: 'Industry Solutions',
+    categories: ["Industry Solutions","Business Software"],
     industry: 'Education & Academics',
     description: 'Unified academic institution platform linking digital curriculum distribution, parent portals, interactive gradebooks, and fee collection.',
     features: [
@@ -185,6 +192,7 @@ export const demoProjectsData: DemoProject[] = [
     id: 'medicare-plus',
     name: 'MediCare Plus',
     category: 'Industry Solutions',
+    categories: ["Industry Solutions","Mobile Apps","Websites"],
     industry: 'Healthcare & Telemedicine',
     description: 'HIPAA-conscious healthcare portal and patient app with encrypted teleconsultation, digital prescription storage, and lab report delivery.',
     features: [
@@ -209,6 +217,7 @@ export const demoProjectsData: DemoProject[] = [
     id: 'elite-events',
     name: 'EliteEvents',
     category: 'Industry Solutions',
+    categories: ["Industry Solutions","Websites"],
     industry: 'Event Management & Experiential',
     description: 'End-to-end event management suite with dynamic stage schedules, tiered ticket purchasing, digital QR check-in, and speaker directories.',
     features: [
@@ -233,6 +242,7 @@ export const demoProjectsData: DemoProject[] = [
     id: 'greenleaf-organics',
     name: 'GreenLeaf Organics',
     category: 'E-commerce',
+    categories: ["E-commerce","Websites"],
     industry: 'Organic FMCG & Superfoods',
     description: 'Farm-to-table organic grocery marketplace with recurring farm box subscriptions, cold-chain delivery tracker, and nutritional transparency.',
     features: [
@@ -257,6 +267,7 @@ export const demoProjectsData: DemoProject[] = [
     id: 'nex-law',
     name: 'NexLaw',
     category: 'Websites',
+    categories: ["Websites","Industry Solutions"],
     industry: 'Legal Services & Corporate Counsel',
     description: 'Authoritative corporate law firm platform with practice area taxonomy, partner credential vaults, encrypted document intake, and case consultation billing.',
     features: [
@@ -281,6 +292,7 @@ export const demoProjectsData: DemoProject[] = [
     id: 'hotel-flow',
     name: 'HotelFlow',
     category: 'Business Software',
+    categories: ["Business Software","Industry Solutions"],
     industry: 'Hospitality & Resort Management',
     description: 'Full-stack property management system (PMS) synchronizing OTA channels, room housekeeping status, minibar auditing, and front-desk check-in.',
     features: [
@@ -305,6 +317,7 @@ export const demoProjectsData: DemoProject[] = [
     id: 'retail-pro',
     name: 'RetailPro',
     category: 'Business Software',
+    categories: ["Business Software","E-commerce"],
     industry: 'Retail & Multi-store POS',
     description: 'High-speed cloud POS and retail management software supporting offline billing, multi-store barcode scanning, and supplier purchase orders.',
     features: [
@@ -329,6 +342,7 @@ export const demoProjectsData: DemoProject[] = [
     id: 'clinic-desk',
     name: 'ClinicDesk',
     category: 'Business Software',
+    categories: ["Business Software","Industry Solutions"],
     industry: 'Outpatient Clinic & Practice Care',
     description: 'Specialized clinic management software covering doctor appointment queueing, electronic medical records (EMR), and diagnostic billing.',
     features: [
@@ -353,6 +367,7 @@ export const demoProjectsData: DemoProject[] = [
     id: 'school-sphere',
     name: 'SchoolSphere',
     category: 'Business Software',
+    categories: ["Business Software","Industry Solutions"],
     industry: 'School Management & K-12',
     description: 'Comprehensive ERP for schools managing student admissions, biometrics attendance, automated timetable scheduling, and bus GPS tracking.',
     features: [
@@ -377,6 +392,7 @@ export const demoProjectsData: DemoProject[] = [
     id: 'gym-core',
     name: 'GymCore',
     category: 'Business Software',
+    categories: ["Business Software","Mobile Apps"],
     industry: 'Gym & Fitness Centers',
     description: 'Membership and access-control software for fitness centers with turnstile biometric integration, personal trainer bookings, and recurring dues.',
     features: [
@@ -401,6 +417,7 @@ export const demoProjectsData: DemoProject[] = [
     id: 'serve-book',
     name: 'ServeBook',
     category: 'Business Software',
+    categories: ["Business Software","Mobile Apps"],
     industry: 'Home Services & Facility Management',
     description: 'Dispatch and booking operating system for appliance repair, plumbing, and electrical service companies with technician geo-routing.',
     features: [
@@ -425,6 +442,7 @@ export const demoProjectsData: DemoProject[] = [
     id: 'stock-pilot',
     name: 'StockPilot',
     category: 'Business Software',
+    categories: ["Business Software","SaaS Platforms"],
     industry: 'Inventory & Warehouse Management',
     description: 'Multi-warehouse stock inventory system with bin location mapping, pick-and-pack optimization, and batch expiration auditing.',
     features: [
@@ -449,6 +467,7 @@ export const demoProjectsData: DemoProject[] = [
     id: 'biz-ledger',
     name: 'BizLedger',
     category: 'Business Software',
+    categories: ["Business Software","SaaS Platforms"],
     industry: 'Business Accounting & Tax',
     description: 'Compliant business accounting suite with automated bank reconciliation, GST / VAT reporting, double-entry ledgers, and profit analytics.',
     features: [
@@ -473,6 +492,7 @@ export const demoProjectsData: DemoProject[] = [
     id: 'fleet-track',
     name: 'FleetTrack',
     category: 'Business Software',
+    categories: ["Business Software","Industry Solutions"],
     industry: 'Fleet & Telematics Logistics',
     description: 'Commercial fleet telematics and vehicle maintenance system with GPS route tracking, fuel consumption telemetry, and driver safety scoring.',
     features: [
@@ -497,6 +517,7 @@ export const demoProjectsData: DemoProject[] = [
     id: 'hr-matrix',
     name: 'HRMatrix',
     category: 'Business Software',
+    categories: ["Business Software","SaaS Platforms"],
     industry: 'HR & Payroll Management',
     description: 'Human resource information system featuring automated salary slip generation, biometric clock-in, leave approvals, and employee performance reviews.',
     features: [
@@ -521,6 +542,7 @@ export const demoProjectsData: DemoProject[] = [
     id: 'lead-sphere',
     name: 'LeadSphere',
     category: 'SaaS Platforms',
+    categories: ["SaaS Platforms","Business Software"],
     industry: 'CRM & Pipeline Automation',
     description: 'High-velocity sales CRM featuring automated lead enrichment, visual Kanban deal stages, email sequence cadence, and revenue forecasting.',
     features: [
@@ -545,6 +567,7 @@ export const demoProjectsData: DemoProject[] = [
     id: 'invoice-cloud',
     name: 'InvoiceCloud',
     category: 'SaaS Platforms',
+    categories: ["SaaS Platforms","Business Software"],
     industry: 'Invoicing & Subscription Billing',
     description: 'SaaS billing platform with recurring metered subscriptions, multi-currency invoices, automated late payment reminders, and payment gateway webhooks.',
     features: [
@@ -569,6 +592,7 @@ export const demoProjectsData: DemoProject[] = [
     id: 'team-flow',
     name: 'TeamFlow',
     category: 'SaaS Platforms',
+    categories: ["SaaS Platforms","Business Software"],
     industry: 'Project Management & Collaboration',
     description: 'Agile team collaboration workspace combining interactive Kanban boards, Gantt chart dependencies, live document editing, and sprint burndown graphs.',
     features: [
@@ -593,6 +617,7 @@ export const demoProjectsData: DemoProject[] = [
     id: 'book-ease',
     name: 'BookEase',
     category: 'SaaS Platforms',
+    categories: ["SaaS Platforms","Websites"],
     industry: 'Appointment Booking SaaS',
     description: 'Sleek self-scheduling booking SaaS for consultants, tutors, and professionals with Google / Outlook calendar sync and upfront payment collection.',
     features: [
@@ -616,7 +641,8 @@ export const demoProjectsData: DemoProject[] = [
   {
     id: 'store-pilot',
     name: 'StorePilot',
-    category: 'SaaS Platforms',
+    category: 'E-commerce',
+    categories: ["E-commerce","SaaS Platforms"],
     industry: 'Multi-Tenant E-commerce SaaS',
     description: 'Modern headless commerce engine allowing entrepreneurs to spin up branded online stores in minutes with sub-second catalog page speeds.',
     features: [
@@ -641,6 +667,7 @@ export const demoProjectsData: DemoProject[] = [
     id: 'client-hub',
     name: 'ClientHub',
     category: 'SaaS Platforms',
+    categories: ["SaaS Platforms","Business Software"],
     industry: 'Agency Management & Client Portal',
     description: 'White-label client portal for creative and digital agencies to share deliverables, collect design approvals, and manage monthly retainers.',
     features: [
@@ -665,6 +692,7 @@ export const demoProjectsData: DemoProject[] = [
     id: 'food-rush',
     name: 'FoodRush',
     category: 'Mobile Apps',
+    categories: ["Mobile Apps","E-commerce"],
     industry: 'Food Delivery & Quick-Commerce',
     description: 'On-demand food delivery mobile ecosystem connecting customer iOS/Android apps, live courier GPS navigation, and restaurant order tablets.',
     features: [
@@ -689,6 +717,7 @@ export const demoProjectsData: DemoProject[] = [
     id: 'quick-serve',
     name: 'QuickServe',
     category: 'Mobile Apps',
+    categories: ["Mobile Apps","Business Software"],
     industry: 'On-Demand Home Services App',
     description: 'Consumer mobile app for instant booking of vetted electricians, plumbers, home cleaners, and carpenters with transparent upfront pricing.',
     features: [
@@ -713,6 +742,7 @@ export const demoProjectsData: DemoProject[] = [
     id: 'travel-go',
     name: 'TravelGo',
     category: 'Industry Solutions',
+    categories: ["Industry Solutions","Mobile Apps","Websites"],
     industry: 'Travel & Tourism Marketplace',
     description: 'Integrated travel discovery platform aggregating international flight searches, curated boutique holiday packages, and visa guidance.',
     features: [
@@ -737,6 +767,7 @@ export const demoProjectsData: DemoProject[] = [
     id: 'vendor-connect',
     name: 'VendorConnect',
     category: 'E-commerce',
+    categories: ["E-commerce","SaaS Platforms","Business Software"],
     industry: 'B2B Wholesale Marketplace',
     description: 'High-volume wholesale commerce exchange supporting minimum order quantities (MOQs), tiered volume pricing, trade credit, and RFQ negotiations.',
     features: [
