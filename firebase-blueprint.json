@@ -56,12 +56,101 @@
         }
       },
       "required": ["name", "phone", "email", "projectType", "budgetRange", "message", "createdAt"]
+    },
+    "Lead": {
+      "title": "Business OS CRM Lead",
+      "description": "Customer inquiry and lead record synchronized with Business OS CRM.",
+      "type": "object",
+      "properties": {
+        "leadId": {
+          "type": "string",
+          "description": "Unique identifier for the lead."
+        },
+        "customerName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 150,
+          "description": "Full customer name."
+        },
+        "mobile": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 25,
+          "description": "Contact phone or WhatsApp number."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 150,
+          "description": "Customer email address."
+        },
+        "serviceCategory": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Selected service or project category."
+        },
+        "projectDescription": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 3000,
+          "description": "Description of project requirements or message."
+        },
+        "budget": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Budget range or estimation preference."
+        },
+        "source": {
+          "type": "string",
+          "enum": ["Website"],
+          "description": "Origin source of the lead."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["New"],
+          "description": "Current CRM lead status."
+        },
+        "assignedTo": {
+          "type": "null",
+          "description": "Assigned team member (null on creation)."
+        },
+        "nextFollowUp": {
+          "type": "null",
+          "description": "Next follow-up date (null on creation)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of lead creation."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of lead update."
+        }
+      },
+      "required": [
+        "leadId",
+        "customerName",
+        "mobile",
+        "email",
+        "serviceCategory",
+        "projectDescription",
+        "source",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
     }
   },
   "firestore": {
     "/enquiries/{enquiryId}": {
       "schema": "Enquiry",
       "description": "Client project enquiries and proposal requests submitted via the TechSoftware.digital portal."
+    },
+    "/leads/{leadId}": {
+      "schema": "Lead",
+      "description": "Direct customer leads submitted through the website and synchronized with Business OS CRM."
     }
   }
 }

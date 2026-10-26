@@ -1,10 +1,10 @@
 /**
  * TechSoftware.digital - Lead Submission Service
- * Connects frontend inquiry forms directly to Google Apps Script Web App -> Google Sheet "Website Leads".
- * Dual-persists to Google Sheet Webhook and Firebase Firestore for guaranteed lead capture.
+ * Direct integration with Business OS CRM (Firestore 'leads' collection)
+ * and Google Apps Script Web App -> Google Sheet "Website Leads".
  */
 
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { collection, doc, setDoc, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 
 export const GOOGLE_SHEET_WEBHOOK_URL =
@@ -31,60 +31,64 @@ export interface SubmissionResult {
 }
 
 /**
- * Transmits lead data to Google Sheet Webhook and persists in Firestore.
+ * Persists inquiry lead data into Business OS CRM ('leads' collection in Firestore)
+ * and transmits to Google Sheet Webhook for dual-redundancy lead capture.
  */
 export async function submitLeadToGoogleSheet(
   data: LeadSubmissionData
 ): Promise<SubmissionResult> {
   const timestamp = new Date().toISOString();
-  const source = data.source || 'TechSoftware.digital Website';
-  const status = 'New Lead';
-  const referenceToken = `TS-${Date.now().toString().slice(-6)}`;
+  const source = 'Website';
+  const status = 'New';
 
   const company = data.company?.trim() || 'N/A';
-  const projectType = data.projectType?.trim() || (data.inquiryType === 'Contact Us' ? 'General Consultation' : 'Websites');
-  const budget = data.budget?.trim() || (data.inquiryType === 'Contact Us' ? 'Discuss with us' : '₹50,000 – ₹1,00,000');
+  const projectType =
+    data.projectType?.trim() ||
+    (data.inquiryType === 'Contact Us' ? 'General Consultation' : 'Websites');
+  const budget =
+    data.budget?.trim() ||
+    (data.inquiryType === 'Contact Us' ? 'Discuss with us' : '₹50,000 – ₹1,00,000');
   const name = data.name.trim();
   const phone = data.phone.trim();
   const email = data.email.trim();
   const message = data.message.trim();
 
-  // 1. Build URLSearchParams with both exact Sheet column headers and standard camelCase keys
-  // Columns: A=Timestamp, B=Inquiry Type, C=Name, D=Phone, E=Email, F=Company, G=Project Type, H=Budget, I=Message, J=Source, K=Status
-  const formParams = new URLSearchParams();
+  // Create unique DocumentReference in Firestore 'leads' collection
+  const leadDocRef = doc(collection(db, 'leads'));
+  const leadId = leadDocRef.id;
 
-  // Exact Google Sheet Column Headers
-  formParams.append('Timestamp', timestamp);
-  formParams.append('Inquiry Type', data.inquiryType);
-  formParams.append('Name', name);
-  formParams.append('Phone', phone);
-  formParams.append('Email', email);
-  formParams.append('Company', company);
-  formParams.append('Project Type', projectType);
-  formParams.append('Budget', budget);
-  formParams.append('Message', message);
-  formParams.append('Source', source);
-  formParams.append('Status', status);
-  formParams.append('Reference', referenceToken);
+  // 1. Build Business OS CRM payload according to exact schema
+  const businessOsLeadPayload: Record<string, any> = {
+    leadId,
+    customerName: name,
+    mobile: phone,
+    email,
+    serviceCategory: projectType,
+    projectDescription: message,
+    budget: budget && budget !== 'N/A' ? budget : null,
+    source: 'Website',
+    status: 'New',
+    assignedTo: null,
+    nextFollowUp: null,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  };
 
-  // CamelCase equivalents for scripts expecting camelCase
-  formParams.append('timestamp', timestamp);
-  formParams.append('inquiryType', data.inquiryType);
-  formParams.append('name', name);
-  formParams.append('phone', phone);
-  formParams.append('email', email);
-  formParams.append('company', company);
-  formParams.append('companyName', company);
-  formParams.append('projectType', projectType);
-  formParams.append('budget', budget);
-  formParams.append('budgetRange', budget);
-  formParams.append('message', message);
-  formParams.append('source', source);
-  formParams.append('status', status);
-  formParams.append('reference', referenceToken);
+  if (company && company !== 'N/A') {
+    businessOsLeadPayload.company = company;
+  }
 
-  // Parallel background backup to Firestore (does not block sheet submission if offline)
-  const firestoreBackupPromise = (async () => {
+  // 2. Persist to Business OS CRM (Firestore 'leads' collection)
+  let firestoreSaved = false;
+  try {
+    await setDoc(leadDocRef, businessOsLeadPayload);
+    firestoreSaved = true;
+  } catch (fsErr) {
+    console.error('Firestore Business OS CRM lead persistence error:', fsErr);
+  }
+
+  // Also write legacy enquiry record in parallel for backwards safety
+  (async () => {
     try {
       if (db) {
         await addDoc(collection(db, 'enquiries'), {
@@ -99,20 +103,51 @@ export async function submitLeadToGoogleSheet(
           status: 'new',
         });
       }
-    } catch (fsErr) {
-      // Non-fatal: logged quietly without interrupting user flow
-      console.warn('Firestore backup note:', fsErr);
+    } catch (legacyErr) {
+      // Non-fatal legacy backup
+      console.warn('Legacy enquiries backup note:', legacyErr);
     }
   })();
 
-  // 2. Submit to Google Apps Script Webhook
+  // 3. Dual-post to Google Sheet Webhook ("Website Leads")
+  const formParams = new URLSearchParams();
+
+  // Exact Google Sheet Column Headers
+  formParams.append('Timestamp', timestamp);
+  formParams.append('Inquiry Type', data.inquiryType);
+  formParams.append('Name', name);
+  formParams.append('Phone', phone);
+  formParams.append('Email', email);
+  formParams.append('Company', company);
+  formParams.append('Project Type', projectType);
+  formParams.append('Budget', budget);
+  formParams.append('Message', message);
+  formParams.append('Source', source);
+  formParams.append('Status', status);
+  formParams.append('Reference', leadId);
+
+  // CamelCase equivalents
+  formParams.append('timestamp', timestamp);
+  formParams.append('inquiryType', data.inquiryType);
+  formParams.append('name', name);
+  formParams.append('phone', phone);
+  formParams.append('email', email);
+  formParams.append('company', company);
+  formParams.append('companyName', company);
+  formParams.append('projectType', projectType);
+  formParams.append('budget', budget);
+  formParams.append('budgetRange', budget);
+  formParams.append('message', message);
+  formParams.append('source', source);
+  formParams.append('status', status);
+  formParams.append('reference', leadId);
+
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 20000);
 
   let sheetSaved = false;
 
   try {
-    // Primary approach: URL-encoded POST with application/x-www-form-urlencoded
     const response = await fetch(GOOGLE_SHEET_WEBHOOK_URL, {
       method: 'POST',
       headers: {
@@ -135,7 +170,7 @@ export async function submitLeadToGoogleSheet(
   } catch (err: any) {
     clearTimeout(timeoutId);
 
-    // If fetch failed due to browser CORS redirect or network filter, attempt no-cors fallback
+    // Fallback attempt for CORS or network redirection
     try {
       await fetch(GOOGLE_SHEET_WEBHOOK_URL, {
         method: 'POST',
@@ -151,20 +186,17 @@ export async function submitLeadToGoogleSheet(
     }
   }
 
-  // Await firestore backup completes
-  await firestoreBackupPromise;
-
-  if (sheetSaved) {
+  // If either Business OS CRM (Firestore) or Google Sheet succeeded, confirm successful submission
+  if (firestoreSaved || sheetSaved) {
     return {
       success: true,
-      referenceToken,
+      referenceToken: leadId,
     };
   }
 
-  // If both network routes were completely unreachable
   return {
     success: false,
-    referenceToken,
+    referenceToken: leadId,
     error: 'Unable to submit your request right now. Please try again or contact us directly.',
   };
 }

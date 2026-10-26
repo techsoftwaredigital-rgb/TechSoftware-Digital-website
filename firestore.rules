@@ -40,6 +40,38 @@ service cloud.firestore {
         (!('status' in data) || (data.status is string && data.status in ['new', 'in_review', 'contacted', 'archived']));
     }
 
+    function isValidLead(data) {
+      return data.keys().hasAll(['leadId', 'customerName', 'mobile', 'email', 'serviceCategory', 'projectDescription', 'source', 'status', 'assignedTo', 'nextFollowUp', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['leadId', 'customerName', 'mobile', 'email', 'serviceCategory', 'projectDescription', 'budget', 'source', 'status', 'assignedTo', 'nextFollowUp', 'createdAt', 'updatedAt', 'company']) &&
+        data.leadId is string && data.leadId.size() >= 1 && data.leadId.size() <= 128 &&
+        data.customerName is string && data.customerName.size() >= 2 && data.customerName.size() <= 150 &&
+        data.mobile is string && data.mobile.size() >= 8 && data.mobile.size() <= 25 &&
+        data.email is string && data.email.size() >= 5 && data.email.size() <= 150 &&
+        data.serviceCategory is string && data.serviceCategory.size() <= 100 &&
+        data.projectDescription is string && data.projectDescription.size() >= 5 && data.projectDescription.size() <= 3000 &&
+        (!('budget' in data) || data.budget == null || (data.budget is string && data.budget.size() <= 100)) &&
+        (!('company' in data) || data.company == null || (data.company is string && data.company.size() <= 150)) &&
+        data.source == 'Website' &&
+        data.status == 'New' &&
+        data.assignedTo == null &&
+        data.nextFollowUp == null &&
+        (data.createdAt is timestamp || data.createdAt == request.time) &&
+        (data.updatedAt is timestamp || data.updatedAt == request.time);
+    }
+
+    // Business OS CRM Leads Collection
+    match /leads/{leadId} {
+      // Public visitors can submit validated customer inquiries only
+      allow create: if isValidId(leadId) && isValidLead(incoming());
+
+      // Public visitors cannot read, update, or delete existing customer leads.
+      // Authenticated Business OS users have access to manage leads.
+      allow get: if isValidId(leadId) && isSignedIn();
+      allow list: if isSignedIn();
+      allow update: if isValidId(leadId) && isSignedIn();
+      allow delete: if isValidId(leadId) && isSignedIn();
+    }
+
     // Enquiries Collection
     match /enquiries/{enquiryId} {
       // Allow creation of public enquiries from prospective clients with validated payload
