@@ -34,6 +34,12 @@ jobs:
           fi
           echo "Build output verified: dist/ directory contains index.html and assets."
 
+      - name: Verify Google Search Console verification file
+        run: |
+          test -f dist/googlef8752ce3b062c179.html
+          grep -Fx "google-site-verification: googlef8752ce3b062c179.html" dist/googlef8752ce3b062c179.html
+          echo "Verified dist/googlef8752ce3b062c179.html exists with exact verification token."
+
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
