@@ -12,76 +12,76 @@ export interface ServiceItem {
 export const servicesData: ServiceItem[] = [
   {
     id: 'websites',
-    title: 'WEBSITES',
-    shortDescription: 'Modern responsive websites designed for businesses, brands and global enterprises.',
-    fullDescription: 'We engineer ultra-fast, visually commanding websites built to convert visitors into loyal clients. Custom-crafted with responsive layouts, fluid typography, modern animation systems, and search engine optimization built-in from the ground up.',
+    title: 'WEBSITE DEVELOPMENT',
+    shortDescription: 'Website development company in India crafting modern, fast, and responsive business websites.',
+    fullDescription: 'As a dedicated website development company in India, TechSoftware.digital builds high-performance corporate websites, product landing pages, and web portals. Each project is engineered with mobile responsiveness, Core Web Vitals optimization, semantic HTML, and technical SEO architecture built-in from the ground up to ensure strong visibility across Google Search.',
     features: [
-      'High-performance responsive design across mobile, tablet, and desktop',
-      'SEO optimization with rich structured data and meta-tag architecture',
-      'Custom animations and micro-interactions for elevated brand presence',
-      'Speed-optimized code delivering sub-second page loads'
+      'Responsive website development for mobile, tablet, and desktop devices',
+      'Technical SEO with structured JSON-LD schema, canonical tags, and Open Graph metadata',
+      'High-speed frontend architecture delivering sub-second load times',
+      'Custom animations and clean visual hierarchy tailored for modern brands'
     ],
-    deliverables: ['Custom UI/UX Theme', 'Full Source Code', 'CMS or Headless Setup', 'Analytics & Domain Wiring'],
-    technologies: ['React', 'Next.js', 'Tailwind CSS', 'TypeScript'],
+    deliverables: ['Custom UI/UX Architecture', 'Full Source Code', 'Production Deployment', 'Search Console & Analytics Integration'],
+    technologies: ['React', 'TypeScript', 'Tailwind CSS', 'Vite', 'Next.js'],
     iconName: 'Globe'
   },
   {
     id: 'web-applications',
-    title: 'WEB APPLICATIONS',
-    shortDescription: 'Custom business workflow platforms, client portals and scalable web applications.',
-    fullDescription: 'From client self-service portals to data-intensive operational management platforms, we architect resilient web applications that streamline operations and support complex transactional workflows with enterprise-grade stability.',
+    title: 'WEB APPLICATION DEVELOPMENT',
+    shortDescription: 'Custom web application development and CRM platforms engineered for reliable operations.',
+    fullDescription: 'TechSoftware.digital specializes in web application development, client portals, and custom CRM software. We replace error-prone manual spreadsheets with secure, multi-user web platforms equipped with role-based access control, live data synchronization, and automated notification engines.',
     features: [
       'Secure role-based authentication and granular permission management',
-      'Real-time data synchronization and live event processing',
-      'Intuitive dashboard layouts with interactive reporting and charts',
-      'Resilient RESTful and GraphQL backend integration'
+      'Custom CRM software with customer pipelines and lead lifecycle tracking',
+      'Real-time data synchronization with reactive dashboards and telemetry',
+      'Resilient backend REST and GraphQL APIs with comprehensive data integrity'
     ],
-    deliverables: ['Full-Stack Web Application', 'Admin Console', 'API Endpoints', 'Database Migration Scripts'],
+    deliverables: ['Full-Stack Web Application', 'Admin Management Console', 'API Endpoints', 'Database Migration Scripts'],
     technologies: ['React', 'Node.js', 'PostgreSQL', 'Firebase', 'Express'],
     iconName: 'LayoutGrid'
   },
   {
     id: 'business-software',
-    title: 'BUSINESS SOFTWARE',
-    shortDescription: 'Custom ERP, CRM, POS, inventory, billing and business management systems.',
-    fullDescription: 'Replace chaotic spreadsheets and fragmented SaaS subscriptions with a single cohesive operational engine designed around your exact business logic, billing tiers, inventory lifecycles, and staff hierarchies.',
+    title: 'BUSINESS MANAGEMENT SOFTWARE',
+    shortDescription: 'Custom business management software, ERP systems, billing POS, and business automation solutions.',
+    fullDescription: 'Modernize and unify enterprise operations with custom business management software and business automation solutions. We engineer tailored ERP systems, point-of-sale (POS) billing, multi-warehouse inventory management, and digital invoicing workflows shaped specifically to your operational rules.',
     features: [
-      'Automated invoice generation, tax computation, and digital receipts',
-      'Multi-warehouse stock control with barcode and SKU management',
-      'Integrated ledger, payment reconciliation, and expense tracking',
-      'Automated notifications via SMS, WhatsApp, and email'
+      'Automated invoice generation, tax computation, and digital PDF receipts',
+      'Multi-warehouse stock control with barcode scanning and SKU tracking',
+      'Business automation solutions with automated WhatsApp and email alerts',
+      'Financial ledgers, expense tracking, and real-time operational reporting'
     ],
-    deliverables: ['Operational Dashboard', 'Billing & POS Modules', 'PDF Generator Engine', 'Role Access Management'],
+    deliverables: ['Operational ERP Dashboard', 'Billing & POS Modules', 'PDF Engine', 'Role Access Management'],
     technologies: ['Node.js', 'PostgreSQL', 'Express', 'React', 'Tailwind CSS'],
     iconName: 'Building2'
   },
   {
     id: 'android-apps',
-    title: 'ANDROID APPS',
-    shortDescription: 'High-performance Android applications with modern material aesthetics and offline support.',
-    fullDescription: 'Native and cross-platform Android applications crafted to deliver fluid 60fps animations, intuitive gesture navigation, offline reliability, background workers, and seamless Google Play integration.',
+    title: 'ANDROID APP DEVELOPMENT',
+    shortDescription: 'Android app development company in India engineering native and cross-platform mobile apps.',
+    fullDescription: 'High-performance Android app development designed to perform smoothly across diverse devices and screen sizes. We architect native Kotlin and cross-platform React Native apps with offline cache synchronization, push notification pipelines, Google Pay integration, and Google Play Store deployment readiness.',
     features: [
-      'Native runtime speed optimized for all screen densities and devices',
-      'Offline-first architecture with local cache synchronization',
-      'Firebase Cloud Messaging and push notification pipelines',
-      'Secure biometric authentication and Google Pay payment integration'
+      'Native performance optimization across smartphones and tablets',
+      'Offline-first data storage with automatic cloud synchronization',
+      'Firebase Cloud Messaging (FCM) push notifications and telemetry',
+      'Biometric authentication and secure mobile payment gateways'
     ],
-    deliverables: ['Compiled App Bundles (APK & AAB)', 'Play Store Deployment Support', 'API Backend Endpoints'],
+    deliverables: ['Compiled App Bundles (APK & AAB)', 'Play Store Staging Support', 'Backend API Endpoints'],
     technologies: ['Kotlin', 'React Native', 'TypeScript', 'Firebase'],
     iconName: 'Smartphone'
   },
   {
     id: 'ios-apps',
-    title: 'iOS APPS',
-    shortDescription: 'Premium iOS applications crafted to Apple Human Interface Guidelines standards.',
-    fullDescription: 'Elegant, ultra-fluid iOS applications engineered for iPhone and iPad. Leverages hardware capabilities, Apple Pay, FaceID biometric security, and fluid interactive gestures.',
+    title: 'iOS APP DEVELOPMENT',
+    shortDescription: 'Premium iOS app development adhering strictly to Apple Human Interface Guidelines.',
+    fullDescription: 'Elegant, responsive iOS app development built for iPhone and iPad ecosystems. We craft iOS applications with fluid gesture interactions, FaceID security, Apple Pay integration, and reliable offline data synchronization ready for App Store submission.',
     features: [
-      'Apple Human Interface Guidelines compliance and luxury aesthetics',
-      'Haptic feedback and custom fluid interactive transitions',
-      'Biometric authentication (Face ID / Touch ID) and Apple Pay',
-      'Seamless App Store submission and TestFlight staging'
+      'Apple Human Interface Guidelines compliance and fluid typography',
+      'Biometric authentication (Face ID & Touch ID) and Apple Pay checkout',
+      'Haptic feedback and custom 60fps view transitions',
+      'App Store Connect setup, review compliance, and TestFlight beta staging'
     ],
-    deliverables: ['Xcode Project & IPA Builds', 'App Store Connect Setup', 'TestFlight Staging Access'],
+    deliverables: ['Xcode Project & Archive Builds', 'App Store Connect Setup', 'TestFlight Staging Access'],
     technologies: ['Swift', 'React Native', 'TypeScript', 'Apple Pay'],
     iconName: 'Smartphone'
   },
@@ -117,14 +117,14 @@ export const servicesData: ServiceItem[] = [
   },
   {
     id: 'custom-software',
-    title: 'CUSTOM SOFTWARE',
-    shortDescription: 'Software designed specifically around unique business rules and proprietary algorithms.',
-    fullDescription: 'When off-the-shelf software falls short of your distinct business model, we build purpose-built software from the ground up to address proprietary calculations, legacy data bridges, and unique operational workflows.',
+    title: 'CUSTOM SOFTWARE DEVELOPMENT',
+    shortDescription: 'Bespoke custom software development built around proprietary business logic.',
+    fullDescription: 'When off-the-shelf software falls short, TechSoftware.digital delivers custom software development tailored to your exact business rules, legacy data bridges, and specialized operational workflows with 100% intellectual property ownership.',
     features: [
-      'Tailored business logic engineered without unnecessary bloated bloatware',
+      'Tailored business logic engineered without unnecessary software bloat',
       'Legacy system synchronization and third-party API orchestration',
-      'Custom hardware, sensor, or biometric scanner integrations',
-      'Full intellectual property transfer with complete source code ownership'
+      'Specialized hardware, sensor, or biometric scanner integrations',
+      'Complete intellectual property transfer with full source code ownership'
     ],
     deliverables: ['Custom Application Architecture', 'API Integrations', 'Technical Documentation', 'Maintenance Plan'],
     technologies: ['TypeScript', 'Node.js', 'PostgreSQL', 'Modern Frameworks'],

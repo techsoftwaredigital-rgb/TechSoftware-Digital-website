@@ -41,7 +41,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
         {/* Subheading */}
         <p className="mt-6 text-base sm:text-xl md:text-2xl font-medium text-slate-200 tracking-tight max-w-3xl font-display leading-snug">
-          Websites, Apps, Business Software &amp; AI Solutions engineered for the next generation.
+          Custom Software Development, Modern Websites, Mobile Apps &amp; Business Management Software engineered for ambitious companies across India.
         </p>
 
         {/* Action Buttons */}

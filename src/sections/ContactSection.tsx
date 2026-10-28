@@ -290,9 +290,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
               </a>
 
               <a
-                href="https://ts-devloper.web.app/"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="https://techsoftwaredigital.in/"
                 className="flex items-center gap-3.5 p-3.5 rounded-xl bg-slate-900/70 border border-slate-800 text-slate-200 hover:border-cyan-500/40 hover:text-cyan-300 transition-colors"
               >
                 <div className="w-10 h-10 rounded-lg bg-cyan-950 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0">
@@ -300,7 +298,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                 </div>
                 <div>
                   <div className="text-[10px] font-mono text-slate-500 uppercase">Web Headquarters</div>
-                  <div className="font-semibold text-xs sm:text-sm text-cyan-400">ts-devloper.web.app</div>
+                  <div className="font-semibold text-xs sm:text-sm text-cyan-400">techsoftwaredigital.in</div>
                 </div>
               </a>
             </div>

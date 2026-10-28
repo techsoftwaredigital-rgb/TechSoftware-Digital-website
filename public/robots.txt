@@ -1,4 +1,27 @@
 User-agent: *
 Allow: /
+Allow: /assets/
+Allow: /*.js$
+Allow: /*.css$
+Allow: /*.png$
+Allow: /*.svg$
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.webp$
 
-Sitemap: https://ts-devloper.web.app/sitemap.xml
+# Disallow indexing of private admin, CRM, and dashboard routes
+Disallow: /admin
+Disallow: /admin/
+Disallow: /crm
+Disallow: /crm/
+Disallow: /dashboard
+Disallow: /dashboard/
+Disallow: /command-center
+Disallow: /command-center/
+Disallow: /login
+Disallow: /login/
+Disallow: /auth
+Disallow: /auth/
+Disallow: /api/
+
+Sitemap: https://techsoftwaredigital.in/sitemap.xml

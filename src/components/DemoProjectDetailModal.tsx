@@ -142,7 +142,8 @@ export const DemoProjectDetailModal: React.FC<DemoProjectDetailModalProps> = ({
               {project.image && project.image.trim() !== '' ? (
                 <img
                   src={project.image}
-                  alt={project.name}
+                  alt={`${project.name} – ${project.category} System Architecture Preview – TechSoftware.digital`}
+                  loading="lazy"
                   className="w-full h-full max-h-64 object-cover rounded-lg shadow-lg"
                   onError={(e) => {
                     // Fallback to stylized SVG layout if image fails to load

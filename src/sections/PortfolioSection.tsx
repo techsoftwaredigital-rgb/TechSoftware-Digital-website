@@ -228,7 +228,7 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({
                 {project.image && project.image.trim() !== '' ? (
                   <img
                     src={project.image}
-                    alt={project.name}
+                    alt={`${project.name} – ${project.category} Software Project – TechSoftware.digital`}
                     loading="lazy"
                     decoding="async"
                     width={600}

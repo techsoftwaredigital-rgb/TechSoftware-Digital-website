@@ -56,12 +56,10 @@ export const Footer: React.FC = () => {
               <div className="flex items-center gap-2 text-slate-300">
                 <Globe className="w-3.5 h-3.5 text-cyan-400" />
                 <a
-                  href="https://ts-devloper.web.app/"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href="https://techsoftwaredigital.in/"
                   className="hover:text-cyan-400 transition-colors inline-flex items-center gap-1"
                 >
-                  <span>ts-devloper.web.app</span>
+                  <span>techsoftwaredigital.in</span>
                   <ArrowUpRight className="w-3 h-3 text-slate-500" />
                 </a>
               </div>

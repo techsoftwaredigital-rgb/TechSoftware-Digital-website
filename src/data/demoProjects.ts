@@ -326,7 +326,7 @@ export const demoProjectsData: DemoProject[] = [
       'Supplier purchase order generation based on predictive reorder points'
     ],
     image: '/assets/images/solution_pos_retail_1791023776756.jpg',
-    demoUrl: 'https://ts-devloper.web.app/',
+    demoUrl: 'https://techsoftwaredigital.in/',
     status: 'live',
     demoLabel: 'DEMO PROJECT',
     requestUrl: '#contact',
@@ -526,7 +526,7 @@ export const demoProjectsData: DemoProject[] = [
       'Quarterly OKR / KPI performance tracking with 360-degree peer feedback'
     ],
     image: '/assets/images/solution_erp_operations_1791023763347.jpg',
-    demoUrl: 'https://ts-devloper.web.app/',
+    demoUrl: 'https://techsoftwaredigital.in/',
     status: 'live',
     demoLabel: 'DEMO PROJECT',
     requestUrl: '#contact',
@@ -551,7 +551,7 @@ export const demoProjectsData: DemoProject[] = [
       'Call dialer integration with automatic call recording & transcript'
     ],
     image: '/assets/images/solution_crm_sales_1791023745384.jpg',
-    demoUrl: 'https://ts-devloper.web.app/',
+    demoUrl: 'https://techsoftwaredigital.in/',
     status: 'live',
     demoLabel: 'DEMO PROJECT',
     requestUrl: '#contact',
@@ -701,7 +701,7 @@ export const demoProjectsData: DemoProject[] = [
       'Customer in-app chat with courier and real-time delivery ETA map'
     ],
     image: '/assets/images/portfolio_fintech_mobile_1791023106605.jpg',
-    demoUrl: 'https://ts-devloper.web.app/',
+    demoUrl: 'https://techsoftwaredigital.in/',
     status: 'live',
     demoLabel: 'DEMO PROJECT',
     requestUrl: '#contact',
@@ -776,7 +776,7 @@ export const demoProjectsData: DemoProject[] = [
       'Net-30 / Net-60 trade credit application with automated credit score check'
     ],
     image: '/assets/images/solution_erp_operations_1791023763347.jpg',
-    demoUrl: 'https://ts-devloper.web.app/',
+    demoUrl: 'https://techsoftwaredigital.in/',
     status: 'live',
     demoLabel: 'DEMO PROJECT',
     requestUrl: '#contact',

@@ -23,25 +23,57 @@ import { PWAProvider } from './context/PWAContext';
 import { PWAInstallModal } from './components/PWAInstallModal';
 import { PWAFloatingButton } from './components/PWAFloatingButton';
 import { PWAInstallGuideModal } from './components/PWAInstallGuideModal';
+import { SEOHead, SEO_ROUTES, isPrivatePath } from './components/SEOHead';
+import { PrivatePortalNotice } from './components/PrivatePortalNotice';
 
 export default function App() {
   const [introFinished, setIntroFinished] = useState(false);
   const [prefilledProjectType, setPrefilledProjectType] = useState<string>('Websites');
   const [prefilledMessage, setPrefilledMessage] = useState<string>('');
   const [prefilledIntent, setPrefilledIntent] = useState<InquiryType>('Start Your Project');
+  const [currentPath, setCurrentPath] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return window.location.pathname;
+    }
+    return '/';
+  });
 
-  // Handle URL redirect if someone lands on /demo-projects: smoothly send to #work
+  // Handle URL route changes, browser back/forward and SEO path routing
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const path = window.location.pathname;
+
+    const handleLocationChange = () => {
+      setCurrentPath(window.location.pathname);
+    };
+
+    window.addEventListener('popstate', handleLocationChange);
+
+    const path = window.location.pathname.replace(/\/+$/, '') || '/';
     const hash = window.location.hash;
+
+    // Handle legacy /demo-projects
     if (path === '/demo-projects' || path.startsWith('/demo-projects/') || hash === '#demo-projects') {
-      window.history.replaceState({}, '', '/#work');
+      window.history.replaceState({}, '', '/portfolio');
+      setCurrentPath('/portfolio');
       setTimeout(() => {
         const elem = document.getElementById('work') || document.getElementById('portfolio');
         if (elem) elem.scrollIntoView({ behavior: 'smooth' });
-      }, 250);
+      }, 300);
+      return () => window.removeEventListener('popstate', handleLocationChange);
     }
+
+    // Handle public SEO service/landing routes smoothly
+    const matchedRoute = SEO_ROUTES[path];
+    if (matchedRoute && matchedRoute.sectionId && matchedRoute.sectionId !== 'home') {
+      setTimeout(() => {
+        const elem = document.getElementById(matchedRoute.sectionId!);
+        if (elem) {
+          elem.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 350);
+    }
+
+    return () => window.removeEventListener('popstate', handleLocationChange);
   }, []);
 
   const scrollToContact = (
@@ -78,8 +110,25 @@ export default function App() {
     }
   };
 
+  // If visiting restricted private portals (admin/crm/dashboard), show private portal with noindex
+  if (isPrivatePath(currentPath)) {
+    return (
+      <>
+        <SEOHead currentPath={currentPath} />
+        <PrivatePortalNotice
+          path={currentPath}
+          onReturnHome={() => {
+            window.history.pushState({}, '', '/');
+            setCurrentPath('/');
+          }}
+        />
+      </>
+    );
+  }
+
   return (
     <PWAProvider>
+      <SEOHead currentPath={currentPath} />
       <div className="min-h-screen bg-[#030712] text-slate-100 relative selection:bg-cyan-500/25 selection:text-cyan-300">
         {/* Website Entrance Cinematic Intro Animation (First-load only, <2s) */}
         {!introFinished && (
@@ -131,9 +180,9 @@ export default function App() {
                 ? 'Android Apps'
                 : serviceTitle.includes('iOS')
                 ? 'iOS Apps'
-                : serviceTitle.includes('WEB APPLICATIONS')
+                : serviceTitle.includes('WEB APPLICATION')
                 ? 'Web Applications'
-                : serviceTitle.includes('BUSINESS SOFTWARE')
+                : serviceTitle.includes('BUSINESS')
                 ? 'Business Software'
                 : serviceTitle.includes('AI')
                 ? 'AI Solutions'

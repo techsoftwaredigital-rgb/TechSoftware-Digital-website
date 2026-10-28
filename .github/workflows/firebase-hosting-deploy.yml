@@ -40,6 +40,14 @@ jobs:
           grep -Fx "google-site-verification: googlef8752ce3b062c179.html" dist/googlef8752ce3b062c179.html
           echo "Verified dist/googlef8752ce3b062c179.html exists with exact verification token."
 
+      - name: Verify SEO sitemap.xml and robots.txt
+        run: |
+          test -f dist/sitemap.xml
+          grep -F "https://techsoftwaredigital.in/" dist/sitemap.xml
+          test -f dist/robots.txt
+          grep -F "Sitemap: https://techsoftwaredigital.in/sitemap.xml" dist/robots.txt
+          echo "Verified dist/sitemap.xml and dist/robots.txt exist and contain canonical directives."
+
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
